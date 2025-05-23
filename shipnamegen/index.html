@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=10">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/bootstrap.min.js"></script>
+
+    <script src="js/adjectives.js"></script>
+    <script src="js/nouns.js"></script>
+    <script src="js/verbs.js"></script>
+    <script src="index.js"></script>
+    <title>Starship Name Generator</title>
+    <link href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAED//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA//8AAAAAAED//wBA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVy8C/wBA//8AQP//AED//wBA//8AAAAAAED//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD83Lj//Ny4//zcuP8AQP//AED//yPF//8AQP//AED//wBP/wYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD83Lj//Ny4//zcuP+hVQD/I8X//yPF//8jxf//I8X//wBL/yUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/Ny4/1cvAv/869n//OvZ/1cvAv9XLwL/I8X//yPF//8AQP//AED//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFcvAv/869n//OvZ/1cvAv/869n/Vy8C/yPF//8AQP//AB6ABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFcvAv/869n//OvZ/6FVAP9XLwL/Vy8C//zr2f9XLwL/Vy8C/1cvAv8AAAAAAAAAAAAAAAAAAAAAAAAAAFcvAv/869n//OvZ//zr2f/83Lj/Vy8C//zr2f/869n/oVUA//zcuP9XLwL/AAAAAAAAAAAAAAAAAAAAAFcvAv/869n//OvZ//zr2f/869n//OvZ//zr2f/869n//OvZ//zcuP/83Lj/AAAAAAAAAAAAAAAAAAAAAAIvuP/869n//OvZ////1P///67//OvZ//zr2f/869n//OvZ/1cvAv/83Lj//Ny4/wAAAAAAAAAAAAAAAAAAAAAFQ/z//OvZ//zr2f///7D///+u//zr2f/869n//OvZ/6FVAP8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUP8/wQ62//869n//OvZ//zr2f/869n//OvZ/wAAAHEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVD/P8FQ/z/ADC///zr2f/869n/oVUA/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQP//AED//wQ62/8CL7j/Ai+4/wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sAAP/TAAD/BQAA/AMAAPgHAAD4AQAA+AcAAPADAADgAwAAwAcAAIAHAACAPwAAgP8AAIH/AACD/wAA//8AAA==" rel="icon" type="image/x-icon" />
+</head>
+
+<style type="text/css">
+  body {
+    background-color: #333a40;
+  }
+
+  h1 {
+    font-size: 6vw;
+  }
+
+  .btn-name, #starshipHull {
+    background-image: url("img/StarshipHull.jpg");
+    font-family: sans-serif;
+    text-transform: uppercase;
+  }
+
+  .btn-outline-name {
+    --bs-btn-border-color: #198754;
+  }
+
+  .user-select-none {
+    user-select: none;
+  }
+
+  #shipName {
+    color: #bbb;
+  }
+  
+  #txtCopy {
+    outline:0px !important;
+    box-shadow: none !important;
+    width: 5px;
+    right: -100px;
+    position: fixed;
+  }
+</style>
+
+<body>
+    <header>
+      <div class="navbar navbar-dark bg-dark">
+        <div class="container">
+          <div class="navbar-brand d-flex align-items-center">
+            <strong>☄Starship Name Generator</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <main>
+      <section class="py-1 text-center container">
+        <div class="row pt-4">
+          <div class="col-lg-6 col-md-8 mx-auto">
+            <button class="btn btn-primary" id="generateBtn">Generate Ship Names</button>
+          </div>
+        </div>
+      </section>
+    
+      <div class="album py-5">
+        <div class="container">
+          <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4" id="nameList">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="namePreview" tabindex="-1" aria-labelledby="namePreviewLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+          <div class="modal-content bg-dark">
+            <div class="modal-header border-0">
+              <h4 class="modal-title text-light" id="namePreviewLabel">Welcome Aboard!</h4>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="d-flex align-items-center justify-content-center h-75" id="starshipHull">
+                <h1 class="text-center text-black user-select-none" id="shipName">
+                  <span id="shipPrefix"></span>
+                  <span id="shipAffix"></span>
+                  <span id="shipPreposition"></span>
+                  <span id="shipPrimary"></span>
+                </h1>
+              </div>
+              <div class="container mt-3">
+                <div class="row">
+                  <div class="col-md mb-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text">Prefix</span>
+                      <input type="text" class="form-control" id="txtPrefix" placeholder="U.S.S.">
+                      <button class="btn btn-outline-light" type="button" id="clearPrefix">✖</button>
+                    </div>
+                  </div>
+                  <div class="col-md mb-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text">Affix</span>
+                      <input type="text" class="form-control" id="txtAffix" placeholder="Shippy">
+                      <button class="btn btn-outline-light" type="button" id="clearAffix">✖</button>
+                    </div>
+                  </div>
+                  <div class="col-md mb-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text">Preposition</span>
+                      <input type="text" class="form-control" id="txtPreposition" placeholder="of">
+                      <button class="btn btn-outline-light" type="button" id="clearPreposition">✖</button>
+                    </div>
+                  </div>
+                  <div class="col-md mb-3">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text">Primary</span>
+                      <input type="text" class="form-control" id="txtPrimary" placeholder="McShipFace">
+                      <button class="btn btn-outline-light" type="button" id="clearPrimary">✖</button>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <button class="btn btn-sm btn-light me-sm-2 mb-3" id="btnInvert">Toggle Hull Colour</button>
+                    <button class="btn btn-sm btn-primary mb-3" id="btnSwap">Swap Name Position</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0">
+              <button class="btn btn-sm btn-success" id="btnCopy">Copy</button>
+              <input class="bg-transparent border-0 me-2" id="txtCopy" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="text-light text-center py-2">
+      <script>document.write(`© Freakium ${/\d{4}/.exec(Date())[0]}`)</script>
+    </footer>
+
+    <script>
+      init();
+    </script>
+</body>
+
+</html>
