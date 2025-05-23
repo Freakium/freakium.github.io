@@ -1,227 +1,255 @@
-<!doctype html>
-<html lang=en>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,shrink-to-fit=no">
-<title>Inventory Manager</title>
-<link rel=stylesheet href=src/bootstrap/css/bootstrap-icons.min.css>
-<link rel=stylesheet href=src/bootstrap/css/bootstrap.min.css>
-<link rel=stylesheet href=src/jquery/jquery-ui.min.css>
-<link rel=stylesheet href=src/flatpickr/css/flatpickr.min.css>
-<link rel=stylesheet href=index.min.css>
-<link rel=icon type=image/x-icon href=img/favicon.ico>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
+  <title>Inventory Manager</title>
+
+  <link rel="stylesheet" href="src/bootstrap/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="src/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="src/jquery/jquery-ui.min.css">
+  <link rel="stylesheet" href="src/flatpickr/css/flatpickr.min.css">
+  <link rel="stylesheet" href="index.css">
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
 </head>
+
 <body class="d-flex flex-column vh-100">
-<nav class="navbar navbar-expand-sm fixed-top bg-secondary-subtle">
-<div class=container-fluid>
-<div class=navbar-brand>
-<img src=img/favicon.ico alt=Logo height=24 class="d-inline-block align-text-top">
-<span class=mx-2>Inventory Manager</span>
-</div>
-<button class=navbar-toggler type=button data-bs-toggle=collapse data-bs-target=#navbarNav aria-controls=navbarNav aria-expanded=false aria-label="Toggle navigation">
-<span class=navbar-toggler-icon></span>
-</button>
-<div class="collapse navbar-collapse" id=navbarNav>
-<ul class="navbar-nav ms-auto">
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" href=# role=button data-bs-toggle=dropdown aria-expanded=false>
-<i class="bi bi-file-earmark mx-2"></i>File
-</a>
-<ul class=dropdown-menu>
-<li>
-<button class=nav-link role=button onclick=loadFileListener() title="Load File"><i class="bi bi-download mx-2"></i>Load File</button>
-<input class=d-none id=fileInput type=file accept=.txt onchange=loadFile() autocomplete=off>
-</li>
-<li>
-<button class=nav-link role=button onclick=saveFile() title="Save File"><i class="bi bi-floppy-fill mx-2"></i>Save File</button>
-</li>
-</ul>
-</li>
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" href=# role=button data-bs-toggle=dropdown aria-expanded=false>
-<i class="bi bi-filter-left mx-2"></i>Sort
-</a>
-<ul class=dropdown-menu>
-<li>
-<button class=nav-link role=button onclick=sortItems() title="Sort By Name"><i class="bi bi-sort-alpha-down mx-2"></i>Name (ASC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("1")' title="Sort By Name"><i class="bi bi-sort-alpha-down-alt mx-2"></i>Name (DSC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("2")' title="Sort By Type"><i class="bi bi-sort-alpha-down mx-2"></i>Type (ASC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("3")' title="Sort By Type"><i class="bi bi-sort-alpha-down-alt mx-2"></i>Type (DSC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("4")' title="Sort By Date"><i class="bi bi-calendar2-plus mx-2"></i>Date (ASC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("5")' title="Sort By Date"><i class="bi bi-calendar2-minus mx-2"></i>Date (DSC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("6")' title="Sort By Quantity"><i class="bi bi-sort-numeric-down mx-2"></i>Quantity (ASC)</button>
-</li>
-<li>
-<button class=nav-link role=button onclick='sortItems("7")' title="Sort By Quantity"><i class="bi bi-sort-numeric-down-alt mx-2"></i>Quantity (DSC)</button>
-</li>
-</ul>
-</li>
-<li class="nav-item dropdown">
-<a class="nav-link dropdown-toggle" href=# role=button data-bs-toggle=dropdown aria-expanded=false>
-<i class="bi bi-gear mx-2"></i>Settings
-</a>
-<ul class="dropdown-menu dropdown-menu-end">
-<li>
-<div class=form-floating>
-<select class=form-select id=currencySymbolSelect autocomplete=off>
-<option selected>$</option>
-<option>€</option>
-<option>£</option>
-<option>¥</option>
-<option>₩</option>
-</select>
-<label for=itemColour>Currency Symbol</label>
-</div>
-</li>
-<li>
-<button class=nav-link role=button title="Clear Data" data-bs-toggle=modal data-bs-target=#clearModal>
-<i class="bi bi-eraser-fill mx-2"></i>Clear Data
-</button>
-</li>
-<li><hr class=dropdown-divider></li>
-<li class=nav-item>
-<button class=nav-link id=themeBtn role=button onclick=toggleTheme() title="Toggle Theme">
-<i class="bi bi-moon-stars-fill mx-2"></i>Dark Mode
-</button>
-</li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-</nav>
-<hr>
-<div class="container mt-5">
-<input class="form-control form-control-lg mb-3" id=inventoryTitle onchange=setTitle(this) value=Inventory autocomplete=off>
-<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5" id=item-list></div>
-<a class=d-none id=downloadLink></a>
-</div>
-<footer class="d-flex align-items-center justify-content-center mt-auto pb-2">
-<a aria-label="Check My GitHub" target=_blank rel=noopener href=https://github.com/Freakium/ title="Check My GitHub">
-<svg id=github-logo height=24 width=24 data-name=Logo xmlns=http://www.w3.org/2000/svg viewBox="0 0 24 24" fill=#888>
-<path d="M12.5.75C6.146.75 1 5.896 1 12.25c0 5.089 3.292 9.387 7.863 10.91.575.101.79-.244.79-.546 0-.273-.014-1.178-.014-2.142-2.889.532-3.636-.704-3.866-1.35-.13-.331-.69-1.352-1.18-1.625-.402-.216-.977-.748-.014-.762.906-.014 1.553.834 1.769 1.179 1.035 1.74 2.688 1.25 3.349.948.1-.747.402-1.25.733-1.538-2.559-.287-5.232-1.279-5.232-5.678 0-1.25.445-2.285 1.178-3.09-.115-.288-.517-1.467.115-3.048 0 0 .963-.302 3.163 1.179.92-.259 1.897-.388 2.875-.388.977 0 1.955.13 2.875.388 2.2-1.495 3.162-1.179 3.162-1.179.633 1.581.23 2.76.115 3.048.733.805 1.179 1.825 1.179 3.09 0 4.413-2.688 5.39-5.247 5.678.417.36.776 1.05.776 2.128 0 1.538-.014 2.774-.014 3.162 0 .302.216.662.79.547C20.709 21.637 24 17.324 24 12.25 24 5.896 18.854.75 12.5.75Z">
-</path>
-</svg>
-</a>
-<span class=ms-1><script>document.write(` Freakium ${/\d{4}/.exec(Date())[0]}`)</script></span>
-</footer>
-<div class="bottom-interaction d-none" id=totalArea>
-<div role=alert class="alert alert-secondary shadow py-2 mb-0">
-<span class="fw-bold mx-auto text-center">Total Price: <span id=totalAmount></span></span>
-</div>
-</div>
-<div class=bottom-interaction id=addButtonArea>
-<button class="btn btn-primary rounded-circle" onclick=addItemMode()><i class="bi bi-plus-lg fs-4"></i></button>
-</div>
-<div class="bottom-interaction mb-5" id=messageArea></div>
-<div class="offcanvas offcanvas-end" tabindex=-1 id=itemForm aria-labelledby=itemFormLabel>
-<div class=offcanvas-header id=itemFormHeader>
-<h5 class=offcanvas-title id=itemFormLabel><span id=itemOperation>Add</span> Item</h5>
-<button type=button class=btn-close data-bs-dismiss=offcanvas aria-label=Close></button>
-</div>
-<div class=offcanvas-body>
-<form method=post id=addUpdateForm onsubmit=addOrUpdateItem(event)>
-<input type=hidden id=itemId>
-<div class="form-floating mb-3">
-<input class=form-control id=itemName name=itemName placeholder="Item Name" autocomplete=off>
-<label for=itemName>Item Name</label>
-</div>
-<div class="form-floating mb-3">
-<input class=form-control id=itemType name=itemType placeholder="Item Type" autocomplete=off>
-<label for=itemType>Item Type</label>
-</div>
-<div class="accordion mb-3" id=accordionOpt>
-<div class=accordion-item>
-<h2 class=accordion-header>
-<button class=accordion-button type=button data-bs-toggle=collapse data-bs-target=#collapseOpt aria-expanded=true aria-controls=collapseOpt>
-Optional
-</button>
-</h2>
-<div id=collapseOpt class="accordion-collapse collapse show" data-bs-parent=#accordionOpt>
-<div class=accordion-body>
-<div class="form-floating mb-3">
-<input class=form-control id=itemColour name=itemColour type=color autocomplete=off>
-<label for=itemColour>Colour</label>
-</div>
-<div class="form-floating mb-3">
-<input class=form-control id=itemQuantity name=itemQuantity type=number placeholder=Quantity min=0 autocomplete=off>
-<label for=itemQuantity>Quantity</label>
-</div>
-<div class="form-floating mb-3">
-<input class="form-control datepicker" id=itemDate name=itemDate placeholder=Date/Time autocomplete=off>
-<label for=itemDate>Date/Time</label>
-</div>
-<div class="input-group mb-3">
-<span class="input-group-text currency-symbol">$</span>
-<div class=form-floating>
-<input class=form-control id=itemPrice name=itemPrice type=number min=0 step=0.01 placeholder="Item Price" autocomplete=off>
-<label for=itemPrice>Price</label>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</form>
-</div>
-<div class="offcanvas-footer d-flex justify-content-between border-top px-3 py-2">
-<button class="btn btn-primary" onclick=addUpdateSave()><i class="bi bi-floppy mx-2"></i>Save</button>
-<button class="btn btn-danger d-none" id=deleteItemBtn><i class="bi bi-trash3 mx-2"></i>Delete</button>
-</div>
-<div class=bottom-interaction id=itemFormMessageArea></div>
-</div>
-<div class=modal tabindex=-1 id=deleteModal aria-modal=true role=dialog>
-<div class=modal-dialog>
-<div class=modal-content>
-<div class="modal-header text-white bg-danger">
-<h1 class="modal-title fs-5"><i class="bi bi-trash3 mx-2"></i>Delete Item</h1>
-<button type=button class=btn-close data-bs-dismiss=modal aria-label=Close></button>
-</div>
-<div class=modal-body>
-<p>Are you sure you want to delete the <strong id=deleteItemName></strong> item from <strong id=deleteDateTime></strong>?</p>
-<div class=messageBox id=deleteModalMessageArea></div>
-</div>
-<div class="modal-footer d-flex justify-content-between py-1">
-<button type=button class="btn btn-danger ms-auto" onclick=deleteItem()><i class="bi bi-trash3 me-1"></i>Delete</button>
-</div>
-</div>
-</div>
-</div>
-<div class=modal tabindex=-1 id=clearModal aria-modal=true role=dialog>
-<div class=modal-dialog>
-<div class=modal-content>
-<div class="modal-header text-white bg-danger">
-<h1 class="modal-title fs-5"><i class="bi bi-eraser-fill mx-2"></i>Clear Data</h1>
-<button type=button class=btn-close data-bs-dismiss=modal aria-label=Close></button>
-</div>
-<div class=modal-body>
-<p>This will clear all inventory data. Do you want to continue?</p>
-<div class=messageBox id=clearModalMessageArea></div>
-</div>
-<div class="modal-footer d-flex justify-content-between py-1">
-<button type=button class="btn btn-danger ms-auto" onclick=clearData()><i class="bi bi-eraser-fill me-1"></i>Clear</button>
-</div>
-</div>
-</div>
-</div>
-<script src=src/bootstrap/js/bootstrap.bundle.min.js></script>
-<script src=src/jquery/jquery-3.7.1.min.js></script>
-<script src=src/jquery/jquery-ui.min.js></script>
-<script src=src/jquery/jquery.ui.touch-punch.min.js></script>
-<script src=src/flatpickr/js/flatpickr.min.js></script>
-<script src=api.min.js></script>
-<script src=index.min.js></script>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-sm fixed-top bg-secondary-subtle">
+    <div class="container-fluid">
+      <div class="navbar-brand">
+        <img src="img/favicon.ico" alt="Logo" height="24" class="d-inline-block align-text-top">
+        <span class="mx-2">Inventory Manager</span>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-file-earmark mx-2"></i>File
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="nav-link" role="button" onclick="loadFileListener()" title="Load File"><i class="bi bi-download mx-2"></i>Load File</button>
+                <input class="d-none" id="fileInput" type="file" accept=".txt" onchange="loadFile()" autocomplete="off">
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="saveFile()" title="Save File"><i class="bi bi-floppy-fill mx-2"></i>Save File</button>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-filter-left mx-2"></i>Sort
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems()" title="Sort By Name"><i class="bi bi-sort-alpha-down mx-2"></i>Name (ASC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('1')" title="Sort By Name"><i class="bi bi-sort-alpha-down-alt mx-2"></i>Name (DSC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('2')" title="Sort By Type"><i class="bi bi-sort-alpha-down mx-2"></i>Type (ASC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('3')" title="Sort By Type"><i class="bi bi-sort-alpha-down-alt mx-2"></i>Type (DSC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('4')" title="Sort By Date"><i class="bi bi-calendar2-plus mx-2"></i>Date (ASC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('5')" title="Sort By Date"><i class="bi bi-calendar2-minus mx-2"></i>Date (DSC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('6')" title="Sort By Quantity"><i class="bi bi-sort-numeric-down mx-2"></i>Quantity (ASC)</button>
+              </li>
+              <li>
+                <button class="nav-link" role="button" onclick="sortItems('7')" title="Sort By Quantity"><i class="bi bi-sort-numeric-down-alt mx-2"></i>Quantity (DSC)</button>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-gear mx-2"></i>Settings
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <div class="form-floating">
+                  <select class="form-select" id="currencySymbolSelect" autocomplete="off">
+                    <option selected>$</option>
+                    <option>€</option>
+                    <option>£</option>
+                    <option>¥</option>
+                    <option>₩</option>
+                  </select>
+                  <label for="itemColour">Currency Symbol</label>
+                </div>
+              </li>
+              <li>
+                <button class="nav-link" role="button" title="Clear Data" data-bs-toggle="modal" data-bs-target="#clearModal">
+                  <i class="bi bi-eraser-fill mx-2"></i>Clear Data
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li class="nav-item">
+                <button class="nav-link" id="themeBtn" role="button" onclick="toggleTheme()" title="Toggle Theme">
+                  <i class="bi bi-moon-stars-fill mx-2"></i>Dark Mode
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- EXTRA SPACING -->
+  <hr>
+
+  <!-- INVENTORY LIST -->
+  <div class="container mt-5">
+    <input class="form-control form-control-lg mb-3" id="inventoryTitle" onchange="setTitle(this)" value="Inventory" autocomplete="off">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 mb-5" id="item-list"></div>
+    <a class="d-none" id="downloadLink"></a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="d-flex align-items-center justify-content-center mt-auto pb-2">
+    <a aria-label="Check My GitHub" target="_blank" rel="noopener" href="https://github.com/Freakium/"
+      title="Check My GitHub">
+      <svg id="github-logo" height="24" width="24" data-name="Logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#888">
+        <path
+          d="M12.5.75C6.146.75 1 5.896 1 12.25c0 5.089 3.292 9.387 7.863 10.91.575.101.79-.244.79-.546 0-.273-.014-1.178-.014-2.142-2.889.532-3.636-.704-3.866-1.35-.13-.331-.69-1.352-1.18-1.625-.402-.216-.977-.748-.014-.762.906-.014 1.553.834 1.769 1.179 1.035 1.74 2.688 1.25 3.349.948.1-.747.402-1.25.733-1.538-2.559-.287-5.232-1.279-5.232-5.678 0-1.25.445-2.285 1.178-3.09-.115-.288-.517-1.467.115-3.048 0 0 .963-.302 3.163 1.179.92-.259 1.897-.388 2.875-.388.977 0 1.955.13 2.875.388 2.2-1.495 3.162-1.179 3.162-1.179.633 1.581.23 2.76.115 3.048.733.805 1.179 1.825 1.179 3.09 0 4.413-2.688 5.39-5.247 5.678.417.36.776 1.05.776 2.128 0 1.538-.014 2.774-.014 3.162 0 .302.216.662.79.547C20.709 21.637 24 17.324 24 12.25 24 5.896 18.854.75 12.5.75Z">
+        </path>
+      </svg>
+    </a>
+    <span class="ms-1"><script>document.write(` Freakium ${/\d{4}/.exec(Date())[0]}`)</script></span>
+  </footer>
+
+  <!-- TOTAL AREA -->
+  <div class="bottom-interaction d-none" id="totalArea">
+    <div role="alert" class="alert alert-secondary shadow py-2 mb-0">
+      <span class="fw-bold mx-auto text-center">Total Price: <span id="totalAmount"></span></span>
+    </div>
+  </div>
+
+  <!-- ADD BUTTON -->
+  <div class="bottom-interaction" id="addButtonArea">
+    <button class="btn btn-primary rounded-circle" onclick="addItemMode()"><i class="bi bi-plus-lg fs-4"></i></button>
+  </div>
+
+  <!-- MESSAGE AREA -->
+  <div class="bottom-interaction mb-5" id="messageArea"></div>
+
+  <!-- ADD/UPDATE PANEL -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="itemForm" aria-labelledby="itemFormLabel">
+    <div class="offcanvas-header" id="itemFormHeader">
+      <h5 class="offcanvas-title" id="itemFormLabel"><span id="itemOperation">Add</span> Item</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <form method="post" id="addUpdateForm" onsubmit="addOrUpdateItem(event)">
+        <input type="hidden" id="itemId">
+        <div class="form-floating mb-3">
+          <input class="form-control" id="itemName" name="itemName" placeholder="Item Name" autocomplete="off">
+          <label for="itemName">Item Name</label>
+        </div>
+        <div class="form-floating mb-3">
+          <input class="form-control" id="itemType" name="itemType" placeholder="Item Type" autocomplete="off">
+          <label for="itemType">Item Type</label>
+        </div>
+        <div class="accordion mb-3" id="accordionOpt">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOpt" aria-expanded="true" aria-controls="collapseOpt">
+                Optional
+              </button>
+            </h2>
+            <div id="collapseOpt" class="accordion-collapse collapse show" data-bs-parent="#accordionOpt">
+              <div class="accordion-body">
+                <div class="form-floating mb-3">
+                  <input class="form-control" id="itemColour" name="itemColour" type="color" autocomplete="off">
+                  <label for="itemColour">Colour</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input class="form-control" id="itemQuantity" name="itemQuantity" type="number" placeholder="Quantity" min="0" autocomplete="off">
+                  <label for="itemQuantity">Quantity</label>
+                </div>
+                <div class="form-floating mb-3">
+                  <input class="form-control datepicker" id="itemDate" name="itemDate" placeholder="Date/Time" autocomplete="off">
+                  <label for="itemDate">Date/Time</label>
+                </div>
+                <div class="input-group mb-3">
+                  <span class="input-group-text currency-symbol">$</span>
+                  <div class="form-floating">
+                    <input class="form-control" id="itemPrice" name="itemPrice" type="number" min="0" step="0.01" placeholder="Item Price" autocomplete="off">
+                    <label for="itemPrice">Price</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="offcanvas-footer d-flex justify-content-between border-top px-3 py-2">
+      <button class="btn btn-primary" onclick="addUpdateSave()"><i class="bi bi-floppy mx-2"></i>Save</button>
+      <button class="btn btn-danger d-none" id="deleteItemBtn"><i class="bi bi-trash3 mx-2"></i>Delete</button>
+    </div>
+    <div class="bottom-interaction" id="itemFormMessageArea"></div>
+  </div>
+
+  <!-- DELETION MODAL -->
+  <div class="modal" tabindex="-1" id="deleteModal" aria-modal="true" role="dialog">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+        <div class="modal-header text-white bg-danger">
+          <h1 class="modal-title fs-5"><i class="bi bi-trash3 mx-2"></i>Delete Item</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the <strong id="deleteItemName"></strong> item from <strong id="deleteDateTime"></strong>?</p>
+          <div class="messageBox" id="deleteModalMessageArea"></div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between py-1">
+          <button type="button" class="btn btn-danger ms-auto" onclick="deleteItem()"><i class="bi bi-trash3 me-1"></i>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLEAR MODAL -->
+  <div class="modal" tabindex="-1" id="clearModal" aria-modal="true" role="dialog">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+        <div class="modal-header text-white bg-danger">
+          <h1 class="modal-title fs-5"><i class="bi bi-eraser-fill mx-2"></i>Clear Data</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>This will clear all inventory data. Do you want to continue?</p>
+          <div class="messageBox" id="clearModalMessageArea"></div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between py-1">
+          <button type="button" class="btn btn-danger ms-auto" onclick="clearData()"><i class="bi bi-eraser-fill me-1"></i>Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="src/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="src/jquery/jquery-3.7.1.min.js"></script>
+  <script src="src/jquery/jquery-ui.min.js"></script>
+  <script src="src/jquery/jquery.ui.touch-punch.min.js"></script>
+  <script src="src/flatpickr/js/flatpickr.min.js"></script>
+  <script type="text/javascript" src="api.js"></script>
+  <script type="text/javascript" src="index.js"></script>
 </body>
+
 </html>
