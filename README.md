@@ -1,3 +1,3 @@
 # Freakium
 
-This is my personal playground where I host my personal projects.
+This is my playground where I host my personal projects.
