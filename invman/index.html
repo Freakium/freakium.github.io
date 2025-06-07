@@ -147,7 +147,7 @@ Optional
 <label for=itemColour>Colour</label>
 </div>
 <div class="form-floating mb-3">
-<input class=form-control id=itemQuantity name=itemQuantity type=number placeholder=Quantity min=0 autocomplete=off>
+<input class=form-control id=itemQuantity name=itemQuantity type=number min=0 placeholder=Quantity autocomplete=off>
 <label for=itemQuantity>Quantity</label>
 </div>
 <div class="form-floating mb-3">
@@ -161,11 +161,18 @@ Optional
 <label for=itemPrice>Price</label>
 </div>
 </div>
+<div class=input-group>
+<div class=form-floating>
+<input class=form-control id=itemWeight name=itemWeight type=number min=0 step=0.01 placeholder=Weight autocomplete=off>
+<label for=itemWeight>Weight</label>
+</div>
+<button class="btn btn-secondary" id=itemWeightUnit onclick=toggleWeightUnit(this,event)>kg</button>
 </div>
 </div>
 </div>
 </div>
-<button class="d-none"></button>
+</div>
+<button class=d-none>REQUIRED FOR ENTER KEY</button>
 </form>
 </div>
 <div class="offcanvas-footer d-flex justify-content-between border-top px-3 py-2">
