@@ -4,9 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
-  <title>Freakium's GitHub Projects</title>
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <title>Ross Chan's Portfolio</title>
+  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel=stylesheet href=src/bootstrap/css/bootstrap-icons.min.css>
+  <link rel=stylesheet href=src/bootstrap/css/bootstrap.min.css>
   <style>
+    :root {
+      --ultra-rare: linear-gradient(to right, rgb(50, 160, 240), rgb(125, 60, 189));
+    }
+
     body {
       display: flex;
       flex-direction: column;
@@ -30,25 +36,164 @@
         margin-left: .25rem;
       }
     }
+
+    .hoverCards .card:hover {
+      opacity: 1 !important;
+    }
+
+    .projectCards {
+      img {
+        max-width: 100%;
+      }
+    }
+
+    .ultra-rare {
+      background: var(--ultra-rare);
+      background-clip: text;
+      color: transparent;
+    }
+
+    #themeBtn {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+
+    #titleName {
+      font-weight: 700;
+      font-size: 4.5rem;
+    }
   </style>
 </head>
 
 <body>
   <main>
-    <h1>Freakium's GitHub Projects</h1>
-    <div><hr></div>
-    <ul>
-      <li>
-        <a href="invman">Inventory Manager</a>
-      </li>
-      <li>
-        <a href="motivgen">Motivational Poster Generator</a>
-      </li>
-      <li>
-        <a href="shipnamegen">Starship Name Generator</a>
-      </li>
-    </ul>
+    <button class="btn btn-secondary rounded-circle" id="themeBtn" onclick="toggleTheme()"></button>
+    <div class="container bg-secondary-subtle shadow rounded-4 text-center mt-5 p-5">
+      <div class="d-flex justify-content-center">
+        <h1 class="ultra-rare" id="titleName">Ross Chan</h1>
+      </div>
+      <h3>Full Stack Developer</h3>
+      <h5 class="text-secondary">I have 6+ years of experience with web applications ranging from WordPress eCommerce sites to a tutor ➡ student scheduling platform.</h5>
+      <div class="d-flex justify-content-center flex-column flex-sm-row gap-2">
+        <div class="badge bg-success">PHP</div>
+        <div class="badge bg-primary">JavaScript</div>
+        <div class="badge bg-primary-subtle text-primary-emphasis">JQuery</div>
+        <div class="badge bg-warning-subtle text-warning-emphasis">HTML</div>
+        <div class="badge bg-danger-subtle text-danger-emphasis">CSS</div>
+        <div class="badge bg-success-subtle text-success-emphasis">mySQL</div>
+      </div>
+    </div>
+
+    <div class="container mt-5 p-4">
+      <div class="row hoverCards row-gap-4">
+        <div class="col-sm-4">
+          <div class="card bg-warning-subtle opacity-75 shadow">
+            <div class="card-title text-center text-warning-emphasis pt-2"><h2>Front End</h2></div>
+            <div class="card-body pt-0">
+              <ul>
+                <li>Bootstrap</li>
+                <li>React</li>
+                <li>Angular</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="card bg-success-subtle opacity-75 shadow">
+            <div class="card-title text-center text-success-emphasis pt-2"><h2>Back End</h2></div>
+            <div class="card-body pt-0">
+              <ul>
+                <li>Laravel</li>
+                <li>MS SQL Server</li>
+                <li>phpMyAdmin</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="card bg-primary-subtle opacity-75 shadow">
+            <div class="card-title text-center text-primary-emphasis pt-2"><h2>WordPress</h2></div>
+            <div class="card-body pt-0">
+              <ul>
+                <li>WooCommerce</li>
+                <li>Jetpack</li>
+                <li>Inventory updates</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container bg-secondary-subtle shadow rounded-4 mt-5 p-5 projectCards">
+      <div class="d-flex justify-content-center">
+        <h1 class="ultra-rare fw-bold">Personal Projects</h1>
+      </div>
+
+      <div class="card mt-3 p-4">
+        <div class="card-title p-3 pb-0"><h1><a href="invman">Inventory Manager</a></h1></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">Manage your inventory with this simple JavaScript tool.</div>
+            <div class="col-lg-6"><img src="img/InvMan.jpg"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3 p-4">
+        <div class="card-title p-3 pb-0"><h1><a href="motivgen">Motivational Poster Generator</a></h1></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">Create a motivational poster by uploading your own image or searching for it courtesy of Pexels.</div>
+            <div class="col-lg-6"><img src="img/MotivGen.jpg"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mt-3 p-4">
+        <div class="card-title p-3 pb-0"><h1><a href="shipnamegen">Starship Name Generator</a></h1></div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-6">Generates a list of names for your starship.</div>
+            <div class="col-lg-6"><img src="img/ShipGen.jpg"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
   </main>
+  <script src=src/bootstrap/js/bootstrap.bundle.min.js></script>
+
+  <script>
+    (function () {
+      addEventListener("load", (e) => {
+        // set to dark mode if system theme is dark
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          toggleTheme();
+        }
+      });
+
+      /**
+       * Toggles the theme between light and dark mode
+       */
+      window.toggleTheme = () => {
+        const btn = document.getElementById('themeBtn');
+        let html = document.documentElement;
+
+        if (html.hasAttribute('data-bs-theme')) {
+          html.removeAttribute('data-bs-theme');
+          btn.innerHTML = `<i class="bi bi-moon-stars-fill mx-2"></i>`;
+        }
+        else {
+          html.setAttribute('data-bs-theme', 'dark');
+          btn.innerHTML = `<i class="bi bi-brightness-high-fill mx-2"></i>`;
+        }
+      }
+    })();
+  </script>
 </body>
 
 <footer>
