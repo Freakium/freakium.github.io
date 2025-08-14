@@ -10,7 +10,7 @@
   <link rel=stylesheet href=src/bootstrap/css/bootstrap.min.css>
   <style>
     :root {
-      --ultra-rare: linear-gradient(to right, rgb(50, 160, 240), rgb(125, 60, 189));
+      --ultra-rare: repeating-linear-gradient(to right, rgb(50, 160, 240), rgb(125, 60, 189), rgb(50, 160, 240));
     }
 
     body {
@@ -51,9 +51,16 @@
     }
 
     .ultra-rare {
-      background: var(--ultra-rare);
-      background-clip: text;
       color: transparent;
+      background: var(--ultra-rare);
+      background-size: 50% 100%;
+      background-clip: text;
+      animation: ultra-rare-anim 3s linear infinite;
+    }
+    @keyframes ultra-rare-anim {
+      0% {
+        background-position: 100% 0;
+      }
     }
 
     #themeBtn {
@@ -144,7 +151,11 @@
         <div class="card-title"><h3><a href="invman">Inventory Manager</a></h3></div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-6">Manage your inventory with this simple JavaScript tool.</div>
+            <div class="col-lg-6">
+              <p>Manage your inventory with this simple JavaScript tool.</p>
+              <div class="badge" style="background-color: blueviolet">Bootstrap</div>
+              <div class="badge bg-primary">JavaScript</div>
+            </div>
             <div class="col-lg-6"><a href="invman"><img src="img/InvMan.jpg"></a></div>
           </div>
         </div>
@@ -154,7 +165,10 @@
         <div class="card-title"><h3><a href="motivgen">Motivational Poster Generator</a></h3></div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-6">Create a motivational poster by uploading your own image or searching for it courtesy of Pexels.</div>
+            <div class="col-lg-6">
+              <p>Create a motivational poster by uploading your own image or searching for it courtesy of Pexels.</p>
+              <div class="badge bg-danger">Angular</div>
+            </div>
             <div class="col-lg-6"><a href="motivgen"><img src="img/MotivGen.jpg"></a></div>
           </div>
         </div>
@@ -164,7 +178,11 @@
         <div class="card-title"><h3><a href="shipnamegen">Starship Name Generator</a></h3></div>
         <div class="card-body">
           <div class="row">
-            <div class="col-lg-6">Generates a list of names for your starship.</div>
+            <div class="col-lg-6">
+              <p>Generates a list of names for your starship.</p>
+              <div class="badge" style="background-color: blueviolet">Bootstrap</div>
+              <div class="badge bg-primary">JavaScript</div>
+            </div>
             <div class="col-lg-6"><a href="shipnamegen"><img src="img/ShipGen.jpg"></a></div>
           </div>
         </div>
@@ -192,11 +210,11 @@
 
         if (html.hasAttribute('data-bs-theme')) {
           html.removeAttribute('data-bs-theme');
-          btn.innerHTML = `<i class="bi bi-moon-stars-fill mx-2"></i>`;
+          btn.innerHTML = `<i class="bi bi-moon-stars-fill"></i>`;
         }
         else {
           html.setAttribute('data-bs-theme', 'dark');
-          btn.innerHTML = `<i class="bi bi-brightness-high-fill mx-2"></i>`;
+          btn.innerHTML = `<i class="bi bi-brightness-high-fill"></i>`;
         }
       }
     })();
