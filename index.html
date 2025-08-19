@@ -68,11 +68,9 @@
       position: fixed;
       top: 10px;
       right: 10px;
-      z-index: 1;
     }
 
     #titleName {
-      font-weight: 700;
       font-size: 4.5rem;
     }
 
@@ -111,10 +109,10 @@
   <div class="bg bg2"></div>
   <div class="bg bg3"></div>
   <main>
-    <button class="btn btn-secondary rounded-circle" id="themeBtn" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
+    <button class="btn btn-secondary rounded-circle z-1" id="themeBtn" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
     <div class="container bg-secondary-subtle shadow rounded-4 text-center mt-5 p-5">
       <div class="d-flex justify-content-center">
-        <h1 class="ultra-rare" id="titleName">Ross Chan</h1>
+        <h1 class="ultra-rare fw-bold" id="titleName">Ross Chan</h1>
       </div>
       <h3>Full Stack Developer</h3>
       <h5 class="text-secondary">I have 6+ years of experience with web applications ranging from WordPress eCommerce sites to a tutor ➡ student scheduling platform.</h5>
@@ -134,7 +132,7 @@
     <div class="container mt-5 p-4">
       <div class="row hoverCards row-gap-4">
         <div class="col-sm-4">
-          <div class="card bg-warning-subtle opacity-75 shadow">
+          <div class="card bg-warning-subtle opacity-75 border-3 shadow">
             <div class="card-title text-center text-warning-emphasis pt-2"><h3>Front End</h3></div>
             <div class="card-body py-0">
               <ul>
@@ -147,7 +145,7 @@
         </div>
 
         <div class="col-sm-4">
-          <div class="card bg-success-subtle opacity-75 shadow">
+          <div class="card bg-success-subtle opacity-75 border-3 shadow">
             <div class="card-title text-center text-success-emphasis pt-2"><h3>Back End</h3></div>
             <div class="card-body py-0">
               <ul>
@@ -160,7 +158,7 @@
         </div>
 
         <div class="col-sm-4">
-          <div class="card bg-primary-subtle opacity-75 shadow">
+          <div class="card bg-primary-subtle opacity-75 border-3 shadow">
             <div class="card-title text-center text-primary-emphasis pt-2"><h3>WordPress</h3></div>
             <div class="card-body py-0">
               <ul>
