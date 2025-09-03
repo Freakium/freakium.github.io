@@ -109,6 +109,16 @@
         transform: rotate(90deg);
       }
     }
+    @keyframes dissipate {
+      from {
+        transform: scale(0.5) rotate(0deg);
+        opacity: 1;
+      }
+      to {
+        transform: scale(10) rotate(960deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
@@ -279,13 +289,13 @@
        * Randomly sets the main background animation
        */
       function randomBackground() {
-        let rand = Math.floor(Math.random() * 2);
-        switch(rand) {
-          case 1:
-            document.querySelectorAll('.bg').forEach(bg => {
-              bg.style.animationName = "spinner";
-            });
-        }
+        const backgrounds = ['slider', 'spinner', 'dissipate'];
+        let rand = Math.floor(Math.random() * backgrounds.length);
+        let animation = backgrounds[rand];
+
+        document.querySelectorAll('.bg').forEach(bg => {
+          bg.style.animationName = animation;
+        });
       }
     })();
   </script>
