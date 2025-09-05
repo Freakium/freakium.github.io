@@ -63,15 +63,30 @@
         background-position: 100% 0;
       }
     }
+    
+    #titleName {
+      font-size: 4.5rem;
+    }
 
     #themeBtn {
       position: fixed;
       top: 10px;
       right: 10px;
     }
+    
+    #warpBtn {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+    }
 
-    #titleName {
-      font-size: 4.5rem;
+    #warpBody {
+      background: url('img/stars.jpg');
+    }
+
+    #warpCanvas {
+      width: 99vw;
+      height: 99vh;
     }
 
     /* Animated Background */
@@ -138,6 +153,7 @@
 
   <main>
     <button class="btn btn-secondary rounded-circle z-1" id="themeBtn" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
+    <button class="btn" id="warpBtn" data-bs-toggle="offcanvas" data-bs-target="#warpScreen"></button>
     
     <!-- PERSONAL CARD -->
     <div class="container bg-secondary-subtle shadow rounded-4 text-center mt-5 p-5">
@@ -262,17 +278,28 @@
     <!-- /PERSONAL PROJECTS -->
     
   </main>
+
+  <!-- MODALS -->
+  <div class="offcanvas offcanvas-top h-100" id="warpScreen" tabindex="-1">
+    <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="warpBody">
+      <button type="button" class="btn position-fixed end-0 top-0" data-bs-dismiss="offcanvas" aria-label="Close">&nbsp;</button>
+      <canvas id="warpCanvas"></canvas>
+    </div>
+  </div>
+
   <script src=src/bootstrap/js/bootstrap.bundle.min.js></script>
 
   <script>
     (function () {
+      const BACKGROUNDS = ['sliderX', 'sliderY', 'spinner', 'microscope'];
+
       addEventListener("load", (e) => {
         // set to dark mode if system theme is dark
         if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
           toggleTheme();
         }
 
-        // set random animation background
+        // set random background animation
         randomBackground();
       });
 
@@ -297,13 +324,138 @@
        * Randomly sets the main background animation
        */
       function randomBackground() {
-        const backgrounds = ['sliderX', 'sliderY', 'spinner', 'microscope'];
-        let rand = Math.floor(Math.random() * backgrounds.length);
-        let animation = backgrounds[rand];
+        let rand = Math.floor(Math.random() * BACKGROUNDS.length);
+        let animation = BACKGROUNDS[rand];
 
         document.querySelectorAll('.bg').forEach(bg => {
           bg.style.animationName = animation;
         });
+      }
+
+      /*****************************************
+      WARP SPEED SIMULATION
+      *****************************************/
+      let viewScreen = document.getElementById("warpCanvas");
+      let mainContext = viewScreen.getContext('2d');
+      let canvasWidth, canvasHeight, centerX, centerY;
+      let terminate = false;
+
+      const TOTAL_STARS = 500;
+      let stars = [];
+      let frames_per_second = 60;
+
+      let interval = Math.floor(1000 / frames_per_second);
+      let startTime = performance.now();
+      let previousTime = startTime;
+
+      let currentTime = 0;
+      let deltaTime = 0;
+
+      document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
+        terminate = false;
+
+        canvasWidth = viewScreen.offsetWidth;
+        canvasHeight = viewScreen.offsetHeight;
+        viewScreen.width = canvasWidth;
+        viewScreen.height = canvasHeight;
+
+        centerX = Math.floor(canvasWidth * 0.5);
+        centerY = Math.floor(canvasHeight * 0.5);
+
+        setup();
+        draw();
+      });
+      document.getElementById('warpScreen').addEventListener('hidden.bs.offcanvas', e => {
+        mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        terminate = true;
+      });
+
+      class Star {
+        constructor() {
+          this.x = getRandomInt(-centerX, centerX);
+          this.y = getRandomInt(-centerY, centerY);
+          this.counter = getRandomInt(1, canvasWidth);
+
+          this.radiusMax = 1 + Math.random() * 4;
+          this.speed = getRandomInt(1, 8);
+
+          this.context = mainContext;
+        }
+
+        drawStardust() {
+          this.counter -= this.speed;
+
+          if (this.counter < 1) {
+            this.counter = canvasWidth;
+            this.x = getRandomInt(-centerX, centerX);
+            this.y = getRandomInt(-centerY, centerY);
+
+            this.radiusMax = getRandomInt(1, 4);
+            this.speed = getRandomInt(1, 8);
+          }
+
+          let xRatio = this.x / this.counter;
+          let yRatio = this.y / this.counter;
+
+          let starX = remap(xRatio, 0, 1, 0, canvasWidth);
+          let starY = remap(yRatio, 0, 1, 0, canvasHeight);
+
+          this.radius = remap(this.counter, 0, canvasWidth, this.radiusMax, 0);
+
+          mainContext.beginPath();
+          mainContext.arc(starX, starY, this.radius, 0, Math.PI * 2, false);
+          mainContext.closePath();
+
+          mainContext.fillStyle = "#FFF";
+          mainContext.fill();
+        }
+      }
+
+      function setup() {
+        for (let i=0; i < TOTAL_STARS && !terminate; i++) {
+          let star = new Star();
+          stars.push(star);
+        }
+      }
+
+      function draw(timestamp) {
+        currentTime = timestamp;
+        deltaTime = currentTime - previousTime;
+
+        if (deltaTime > interval) {
+          previousTime = currentTime - (deltaTime % interval);
+
+          mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
+          mainContext.fillStyle = "transparent";
+          mainContext.fillRect(0, 0, canvasWidth, canvasHeight);
+
+          mainContext.translate(centerX, centerY);
+
+          for (let i=0; i < stars.length && !terminate; i++) {
+            let star = stars[i];
+            star.drawStardust();
+          }
+
+          mainContext.translate(-centerX, -centerY);
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function remap(value, istart, istop, ostart, ostop) {
+        // Ensure values are numerical to avoid potential errors
+        value = Number(value);
+        istart = Number(istart);
+        istop = Number(istop);
+        ostart = Number(ostart);
+        ostop = Number(ostop);
+
+        // Perform the mapping calculation
+        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
       }
     })();
   </script>
