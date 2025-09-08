@@ -339,8 +339,10 @@
       let mainContext = viewScreen.getContext('2d');
       let canvasWidth, canvasHeight, centerX, centerY;
       let terminate = false;
+      let isWarp = false;
 
       const TOTAL_STARS = 500;
+      const STAR_LENGTH = 1.2;
       let stars = [];
       let frames_per_second = 60;
 
@@ -351,6 +353,7 @@
       let currentTime = 0;
       let deltaTime = 0;
 
+      // LISTENERS //
       document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
         terminate = false;
 
@@ -368,7 +371,11 @@
       document.getElementById('warpScreen').addEventListener('hidden.bs.offcanvas', e => {
         mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
         terminate = true;
+        isWarp = false;
       });
+      document.getElementById('warpCanvas').addEventListener('click', () => {
+        isWarp = !isWarp;
+      })
 
       class Star {
         constructor() {
@@ -391,7 +398,7 @@
             this.y = getRandomInt(-centerY, centerY);
 
             this.radiusMax = getRandomInt(1, 4);
-            this.speed = getRandomInt(1, 8);
+            this.speed = getRandomInt(1, isWarp ? 200 : 8);
           }
 
           let xRatio = this.x / this.counter;
@@ -402,12 +409,29 @@
 
           this.radius = remap(this.counter, 0, canvasWidth, this.radiusMax, 0);
 
+          // Begin drawing
           mainContext.beginPath();
-          mainContext.arc(starX, starY, this.radius, 0, Math.PI * 2, false);
-          mainContext.closePath();
+          mainContext.moveTo(starX, starY);
 
-          mainContext.fillStyle = "#FFF";
-          mainContext.fill();
+          // Warp speed
+          if(isWarp) {
+            let prevLoc = {
+              x: (STAR_LENGTH * starX),
+              y: (STAR_LENGTH * starY),
+            };
+            mainContext.lineTo(prevLoc.x, prevLoc.y);
+            mainContext.strokeStyle = "#FFF";
+            mainContext.stroke();
+          }
+          // Impulse speed
+          else {
+            mainContext.arc(starX, starY, this.radius, 0, Math.PI * 2, false);
+            mainContext.fillStyle = "#FFF";
+            mainContext.fill();
+          }
+
+          // Stop drawing
+          mainContext.closePath();
         }
       }
 
