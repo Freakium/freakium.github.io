@@ -332,28 +332,29 @@
         });
       }
 
-      /*****************************************
-      WARP SPEED SIMULATION
-      *****************************************/
+      // WARP SPEED SIMULATION
+      /****************************************/
+      // Screen
       let viewScreen = document.getElementById("warpCanvas");
       let mainContext = viewScreen.getContext('2d');
       let canvasWidth, canvasHeight, centerX, centerY;
       let terminate = false;
       let isWarp = false;
 
+      // Stars
       const TOTAL_STARS = 1000;
       const STAR_LENGTH = 1.2;
       let stars = [];
       let frames_per_second = 60;
 
+      // Timings
       let interval = Math.floor(1000 / frames_per_second);
       let startTime = performance.now();
       let previousTime = startTime;
-
       let currentTime = 0;
       let deltaTime = 0;
 
-      // LISTENERS //
+      // Listeners
       document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
         terminate = false;
 
@@ -377,6 +378,9 @@
         isWarp = !isWarp;
       })
 
+      /**
+       * Draw an animated star/starstreak on a canvas.
+       */
       class Star {
         constructor() {
           this.x = getRandomInt(-centerX, centerX);
@@ -436,6 +440,9 @@
         }
       }
 
+      /**
+       * Initialize starfield.
+       */
       function setup() {
         stars = [];
 
@@ -445,6 +452,9 @@
         }
       }
 
+      /**
+       * Draw the starfield onto the canvas.
+       */
       function draw(timestamp) {
         currentTime = timestamp;
         deltaTime = currentTime - previousTime;
@@ -469,6 +479,11 @@
         requestAnimationFrame(draw);
       }
 
+      /**
+       * Generate a random whole number between two specified values.
+       * @param min The minimum value
+       * @param max The maximum value
+       */
       function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       }
