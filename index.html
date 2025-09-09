@@ -335,15 +335,14 @@
       // WARP SPEED SIMULATION
       /****************************************/
       // Screen
-      let viewScreen = document.getElementById("warpCanvas");
-      let mainContext = viewScreen.getContext('2d');
       let canvasWidth, canvasHeight, centerX, centerY;
-      let terminate = false;
+      let viewScreen = document.getElementById('warpCanvas');
+      let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
 
       // Stars
-      const TOTAL_STARS = 1000;
       const STAR_LENGTH = 1.2;
+      let animationId;
       let stars = [];
       let frames_per_second = 60;
 
@@ -356,54 +355,60 @@
 
       // Listeners
       document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
-        terminate = false;
-
-        canvasWidth = viewScreen.offsetWidth;
-        canvasHeight = viewScreen.offsetHeight;
-        viewScreen.width = canvasWidth;
-        viewScreen.height = canvasHeight;
-
-        centerX = Math.floor(canvasWidth * 0.5);
-        centerY = Math.floor(canvasHeight * 0.5);
-
-        setup();
-        draw();
+        screenInit();
       });
       document.getElementById('warpScreen').addEventListener('hidden.bs.offcanvas', e => {
-        mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
-        terminate = true;
+        screenClear();
         isWarp = false;
       });
-      document.getElementById('warpCanvas').addEventListener('click', () => {
+      viewScreen.addEventListener('click', () => {
         isWarp = !isWarp;
       })
+      screen.orientation.addEventListener('change', () => {
+        let viewScreenOn = document.getElementById('warpScreen').classList.contains('show');
+        if(viewScreenOn) {
+          screenInit();
+        }
+      });
 
       /**
        * Draw an animated star/starstreak on a canvas.
        */
       class Star {
+        #screenEdge = canvasWidth >= canvasHeight ? canvasWidth : canvasHeight;
+
         constructor() {
-          this.x = getRandomInt(-centerX, centerX);
-          this.y = getRandomInt(-centerY, centerY);
-          this.counter = getRandomInt(1, canvasWidth);
+          let star = this.#generateStar();
 
-          this.radiusMax = getRandomInt(1, 3);
-          this.speed = isWarp ? getRandomInt(20, 200) : getRandomInt(1, 10);
+          this.x = star.x;
+          this.y = star.y;
+          this.radiusMax = star.radiusMax;
+          this.speed = star.speed;
 
-          this.context = mainContext;
+          this.counter = getRandomInt(1, this.#screenEdge);
         }
 
-        drawStardust() {
+        #generateStar() {
+          return {
+            x: getRandomInt(-centerX, centerX),
+            y: getRandomInt(-centerY, centerY),
+            radiusMax: getRandomInt(1, 3),
+            speed: isWarp ? getRandomInt(20, 200) : getRandomInt(1, 10)
+          }
+        }
+
+        drawStar() {
           this.counter -= this.speed;
 
           if (this.counter < 1) {
-            let newStar = new Star();
+            let star = this.#generateStar();
 
-            this.counter = canvasWidth;
-            this.x = newStar.x;
-            this.y = newStar.y;
-            this.radiusMax = newStar.radiusMax;
-            this.speed = newStar.speed;
+            this.x = star.x;
+            this.y = star.y;
+            this.radiusMax = star.radiusMax;
+            this.speed = star.speed;
+
+            this.counter = this.#screenEdge;
           }
 
           let xRatio = this.x / this.counter;
@@ -412,14 +417,14 @@
           let starX = remap(xRatio, 0, 1, 0, canvasWidth);
           let starY = remap(yRatio, 0, 1, 0, canvasHeight);
 
-          this.radius = remap(this.counter, 0, canvasWidth, this.radiusMax, 0);
+          this.radius = remap(this.counter, 0, this.#screenEdge, this.radiusMax, 0);
 
           // Begin drawing
           mainContext.beginPath();
-          mainContext.moveTo(starX, starY);
 
           // Warp speed
           if(isWarp) {
+            mainContext.moveTo(starX, starY);
             let prevLoc = {
               x: STAR_LENGTH * starX,
               y: STAR_LENGTH * starY
@@ -441,12 +446,41 @@
       }
 
       /**
+       * Initialize values for current screen size.
+       */
+      function screenInit() {
+        screenClear();
+
+        canvasWidth = viewScreen.offsetWidth;
+        canvasHeight = viewScreen.offsetHeight;
+        viewScreen.width = canvasWidth;
+        viewScreen.height = canvasHeight;
+
+        centerX = Math.floor(canvasWidth * 0.5);
+        centerY = Math.floor(canvasHeight * 0.5);
+
+        setup();
+        draw();
+      }
+
+      /**
+       * Clear the canvas.
+       */
+      function screenClear() {
+        mainContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        cancelAnimationFrame(animationId);
+      }
+
+      /**
        * Initialize starfield.
        */
       function setup() {
         stars = [];
 
-        for (let i=0; i < TOTAL_STARS; i++) {
+        // let total number of stars be half the pixel count of the longest screen length (calculation already stored in center*)
+        let totalStars = canvasWidth >= canvasHeight ? centerX : centerY;
+
+        for (let i=0; i < totalStars; i++) {
           let star = new Star();
           stars.push(star);
         }
@@ -468,15 +502,15 @@
 
           mainContext.translate(centerX, centerY);
 
-          for (let i=0; i < stars.length && !terminate; i++) {
+          for (let i=0; i < stars.length; i++) {
             let star = stars[i];
-            star.drawStardust();
+            star.drawStar();
           }
 
           mainContext.translate(-centerX, -centerY);
         }
 
-        requestAnimationFrame(draw);
+        animationId = requestAnimationFrame(draw);
       }
 
       /**
