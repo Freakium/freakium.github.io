@@ -367,7 +367,12 @@
       screen.orientation.addEventListener('change', () => {
         let viewScreenOn = document.getElementById('warpScreen').classList.contains('show');
         if(viewScreenOn) {
-          screenInit();
+          // use resize event to get proper screen dimensions (otherwise it usually picks up the previous dimensions)
+          var afterOrientation = function() {
+            screenInit();
+            window.removeEventListener('resize', afterOrientation);
+          };
+          window.addEventListener('resize', afterOrientation);
         }
       });
 
