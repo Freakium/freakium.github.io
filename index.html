@@ -73,12 +73,6 @@
       top: 10px;
       right: 10px;
     }
-    
-    #warpBtn {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-    }
 
     #warpBody {
       background: url('img/stars.jpg');
@@ -153,10 +147,10 @@
 
   <main>
     <button class="btn btn-secondary rounded-circle z-1" id="themeBtn" onclick="toggleTheme()"><i class="bi bi-moon-stars-fill"></i></button>
-    <button class="btn" id="warpBtn" data-bs-toggle="offcanvas" data-bs-target="#warpScreen"></button>
     
     <!-- PERSONAL CARD -->
-    <div class="container bg-secondary-subtle shadow rounded-4 text-center mt-5 p-5">
+    <div class="container position-relative bg-secondary-subtle shadow rounded-4 text-center mt-5 p-5">
+      <button class="btn btn-link position-absolute top-0 end-0" data-bs-toggle="offcanvas" data-bs-target="#warpScreen"><i class="bi bi-rocket"></i></button>
       <div class="d-flex justify-content-center">
         <h1 class="ultra-rare fw-bold" id="titleName">Ross Chan</h1>
       </div>
