@@ -136,6 +136,17 @@
         opacity: 0;
       }
     }
+
+    /* Viewscreen Off Button */
+    .turnFade {
+      transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+      transform: rotate(180deg);
+      opacity: 0;
+    }
+    .turnFade:hover {
+      transform: rotate(0deg);
+      opacity: 1;
+    }
   </style>
 </head>
 
@@ -277,7 +288,9 @@
   <!-- MODALS -->
   <div class="offcanvas offcanvas-top h-100" id="warpScreen" tabindex="-1">
     <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="warpBody">
-      <button type="button" class="btn position-fixed end-0 top-0" data-bs-dismiss="offcanvas" aria-label="Close">&nbsp;</button>
+      <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
       <canvas id="warpCanvas"></canvas>
     </div>
   </div>
@@ -330,10 +343,11 @@
       // WARP SPEED SIMULATION
       /****************************************/
       // Screen
-      let canvasWidth, canvasHeight, centerX, centerY;
+      let canvasWidth, canvasHeight, centerX, centerY, clickTimer;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
+      let clickCount = 0;
 
       // Stars
       const STAR_LENGTH = 1.2;
@@ -358,6 +372,18 @@
       });
       viewScreen.addEventListener('click', () => {
         isWarp = !isWarp;
+        clickCount++;
+
+        if(clickCount === 3) {
+          let closeBtn = document.getElementById('closeViewScreen');
+          closeBtn.classList.remove('turnFade');
+          clickCount = 0;
+
+          clearTimeout(clickTimer);
+          clickTimer = setTimeout(() => {
+            closeBtn.classList.add('turnFade');
+          }, 3000);
+        }
       })
       screen.orientation.addEventListener('change', () => {
         let viewScreenOn = document.getElementById('warpScreen').classList.contains('show');
