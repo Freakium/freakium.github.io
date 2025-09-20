@@ -137,7 +137,7 @@
       }
     }
 
-    /* Viewscreen Off Button */
+    /* Viewscreen Buttons */
     .turnFade {
       transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
       transform: rotate(180deg);
@@ -288,6 +288,9 @@
   <!-- MODALS -->
   <div class="offcanvas offcanvas-top h-100" id="warpScreen" tabindex="-1">
     <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="warpBody">
+      <button type="button" class="btn position-fixed start-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire">
+        <i class="bi bi-fire text-danger"></i>
+      </button>
       <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close">
         <i class="bi bi-x-lg text-light"></i>
       </button>
@@ -295,8 +298,8 @@
     </div>
   </div>
 
+  <!-- SCRIPTS -->
   <script src=src/bootstrap/js/bootstrap.bundle.min.js></script>
-
   <script>
     (function () {
       const BACKGROUNDS = ['sliderX', 'sliderY', 'spinner', 'microscope'];
@@ -343,17 +346,21 @@
       // WARP SPEED SIMULATION
       /****************************************/
       // Screen
-      let canvasWidth, canvasHeight, centerX, centerY, clickTimer;
+      let canvasWidth, canvasHeight, centerX, centerY;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
       let clickCount = 0;
+      clickTimers = [];
 
       // Stars
       const STAR_LENGTH = 1.2;
       let animationId;
-      let stars = [];
       let frames_per_second = 60;
+      let stars = [];
+
+      // Torpedo
+      let torpedoes = [];
 
       // Timings
       let interval = Math.floor(1000 / frames_per_second);
@@ -375,14 +382,18 @@
         clickCount++;
 
         if(clickCount === 3) {
-          let closeBtn = document.getElementById('closeViewScreen');
-          closeBtn.classList.remove('turnFade');
-          clickCount = 0;
+          let num = 0;
+          document.querySelectorAll('.turnFade').forEach(btn => {
+            btn.classList.remove('turnFade');
+            clickCount = 0;
 
-          clearTimeout(clickTimer);
-          clickTimer = setTimeout(() => {
-            closeBtn.classList.add('turnFade');
-          }, 3000);
+            clearTimeout(clickTimers[num]);
+            clickTimers[num] = setTimeout(() => {
+              btn.classList.add('turnFade');
+            }, 3000);
+
+            num++;
+          });
         }
       })
       screen.orientation.addEventListener('change', () => {
@@ -398,7 +409,19 @@
       });
 
       /**
-       * Draw an animated star/starstreak on a canvas.
+       * Animate a torpedo firing into the distance.
+       */
+      window.fireTorpedo = () => {
+        let torpedo = new Torpedo();
+        torpedoes.push(torpedo);
+
+        // play sound
+        let photon = new Audio('aud/photon.wav');
+        photon.play();
+      }
+
+      /**
+       * Draw an animated star/starstreak to the canvas.
        */
       class Star {
         #screenEdge = canvasWidth >= canvasHeight ? canvasWidth : canvasHeight;
@@ -472,6 +495,53 @@
       }
 
       /**
+       * Draw an animated torpedo to the canvas.
+       */
+      class Torpedo {
+        constructor() {
+          this.x = getRandomInt(-5, 5); // introduce some randomness to the shots
+          this.y = centerY;
+          this.radius = Math.floor(canvasHeight / 25);
+          this.speed = 6;
+
+          this.counter = canvasHeight;
+        }
+
+        drawTorpedo() {
+          this.counter -= this.speed;
+
+          if(this.radius < 1) {
+            return true;
+          }
+
+          // colours
+          const CORE_COLOUR = '#f4fd7c';
+          const CORE_SIZE = 25;
+          const GLOW_COLOUR = '#fa1400';
+          const GLOW_SIZE = 64;
+
+          this.y -= this.speed;
+          this.radius -= 0.5;
+
+          // Set glow properties
+          mainContext.shadowColor = GLOW_COLOUR;
+          mainContext.shadowBlur = GLOW_SIZE;
+          mainContext.shadowOffsetX = 0;
+          mainContext.shadowOffsetY = 0;
+
+          // Draw the inner core
+          mainContext.beginPath();
+          mainContext.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          mainContext.fillStyle = CORE_COLOUR;
+          mainContext.fill();
+
+          // Reset shadow properties to avoid affecting other drawings
+          mainContext.shadowColor = 'transparent';
+          mainContext.shadowBlur = 0;
+        }
+      }
+
+      /**
        * Initialize values for current screen size.
        */
       function screenInit() {
@@ -531,6 +601,16 @@
           for (let i=0; i < stars.length; i++) {
             let star = stars[i];
             star.drawStar();
+          }
+          for (let j=0; j < torpedoes.length; j++) {
+            let torpedo = torpedoes[j];
+            let fired = torpedo.drawTorpedo();
+            if(fired) {
+              let index = torpedoes.indexOf(torpedo);
+              if (index > -1) {
+                torpedoes.splice(index, 1);
+              }
+            }
           }
 
           mainContext.translate(-centerX, -centerY);
