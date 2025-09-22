@@ -515,10 +515,11 @@
           }
 
           // colours
-          const CORE_COLOUR = '#f4fd7c';
-          const CORE_SIZE = 25;
           const GLOW_COLOUR = '#fa1400';
-          const GLOW_SIZE = 64;
+          const GLOW_SIZE = 32;
+          const CORE_OUTER_COLOUR = '#800a00';
+          const CORE_INNER_COLOUR = '#f4fd7c';
+          const CORE_SIZE = 25;
 
           this.y -= this.speed;
           this.radius -= 0.5;
@@ -529,11 +530,20 @@
           mainContext.shadowOffsetX = 0;
           mainContext.shadowOffsetY = 0;
 
-          // Draw the inner core
+          // Draw the outer core
           mainContext.beginPath();
           mainContext.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          mainContext.fillStyle = CORE_COLOUR;
+          mainContext.fillStyle = CORE_OUTER_COLOUR;
           mainContext.fill();
+
+          // Draw the inner core
+          let innerRadius = Math.floor(this.radius / 4);
+          if(innerRadius >= 1) {
+            mainContext.beginPath();
+            mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
+            mainContext.fillStyle = CORE_INNER_COLOUR;
+            mainContext.fill();
+          }
 
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
