@@ -537,13 +537,11 @@
           mainContext.fill();
 
           // Draw the inner core
-          let innerRadius = Math.floor(this.radius / 4);
-          if(innerRadius >= 1) {
-            mainContext.beginPath();
-            mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
-            mainContext.fillStyle = CORE_INNER_COLOUR;
-            mainContext.fill();
-          }
+          let innerRadius = this.radius / 4;
+          mainContext.beginPath();
+          mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
+          mainContext.fillStyle = CORE_INNER_COLOUR;
+          mainContext.fill();
 
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
