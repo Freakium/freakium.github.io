@@ -335,7 +335,7 @@
        * Randomly sets the main background animation
        */
       function randomBackground() {
-        let rand = Math.floor(Math.random() * BACKGROUNDS.length);
+        let rand = getRandomInt(0, BACKGROUNDS.length);
         let animation = BACKGROUNDS[rand];
 
         document.querySelectorAll('.bg').forEach(bg => {
@@ -502,6 +502,7 @@
           this.x = getRandomInt(-5, 5); // introduce some randomness to the shots
           this.y = centerY;
           this.radius = Math.floor(canvasHeight / 25);
+          this.flareAngle = 0;
           this.speed = 6;
 
           this.counter = canvasHeight;
@@ -523,8 +524,9 @@
 
           this.y -= this.speed;
           this.radius -= 0.5;
+          this.flareAngle = (this.flareAngle + 10) % 360;
 
-          // Set glow properties
+          // Set glow properties (outer core)
           mainContext.shadowColor = GLOW_COLOUR;
           mainContext.shadowBlur = GLOW_SIZE;
 
@@ -534,12 +536,29 @@
           mainContext.fillStyle = CORE_OUTER_COLOUR;
           mainContext.fill();
 
+          // Set glow properties (inner core)
+          mainContext.shadowColor = CORE_INNER_COLOUR;
+          mainContext.shadowBlur = 15;
+
           // Draw the inner core
           let innerRadius = this.radius / 4;
           mainContext.beginPath();
           mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
           mainContext.fillStyle = CORE_INNER_COLOUR;
           mainContext.fill();
+
+          // Prepare rotating flare animation
+          mainContext.save();
+          mainContext.translate(this.x, this.y);
+          mainContext.rotate(this.flareAngle);
+
+          // Draw flare
+          mainContext.moveTo(0, 0);
+          mainContext.lineTo(this.x, this.radius * 2);
+          mainContext.strokeStyle = CORE_INNER_COLOUR;
+          mainContext.lineWidth = this.radius / 10;
+          mainContext.stroke();
+          mainContext.restore();
 
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
