@@ -372,6 +372,7 @@
       // Listeners
       document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
         screenInit();
+        showViewScreenHUD();
       });
       document.getElementById('warpScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
@@ -382,18 +383,7 @@
         clickCount++;
 
         if(clickCount === 3) {
-          let num = 0;
-          document.querySelectorAll('.turnFade').forEach(btn => {
-            btn.classList.remove('turnFade');
-            clickCount = 0;
-
-            clearTimeout(clickTimers[num]);
-            clickTimers[num] = setTimeout(() => {
-              btn.classList.add('turnFade');
-            }, 3000);
-
-            num++;
-          });
+          showViewScreenHUD();
         }
       })
       screen.orientation.addEventListener('change', () => {
@@ -642,6 +632,24 @@
         }
 
         animationId = requestAnimationFrame(draw);
+      }
+
+      /**
+       * Display the viewscreen buttons for 3 seconds,
+       */
+      function showViewScreenHUD() {
+        let num = 0;
+        document.querySelectorAll('.turnFade').forEach(btn => {
+          btn.classList.remove('turnFade');
+          clickCount = 0;
+
+          clearTimeout(clickTimers[num]);
+          clickTimers[num] = setTimeout(() => {
+            btn.classList.add('turnFade');
+          }, 3000);
+
+          num++;
+        });
       }
 
       /**
