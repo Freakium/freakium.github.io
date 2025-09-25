@@ -74,7 +74,7 @@
       right: 10px;
     }
 
-    #warpBody {
+    #viewScreenBody {
       background: url('img/stars.jpg');
     }
 
@@ -175,7 +175,7 @@
         <div class="badge bg-success-subtle text-success-emphasis">mySQL</div>
       </div>
       <div class="mt-3">
-        <a href="https://drive.google.com/file/d/1M_52iWgpXlcJkzs8fYvKz5dCcv4j2fQl/view" target="_blank" class="btn btn-outline-primary">Portfolio</a>
+        <a href="https://drive.google.com/file/d/1M_52iWgpXlcJkzs8fYvKz5dCcv4j2fQl/view" target="_blank" class="btn btn-outline-primary" title="View PDF">Portfolio</a>
       </div>
     </div>
     <!-- /PERSONAL CARD -->
@@ -227,7 +227,9 @@
 
     <!-- PERSONAL PROJECTS -->
     <div class="container position-relative bg-secondary-subtle shadow rounded-4 mt-5 p-5 projectCards">
-      <button class="btn btn-link position-absolute top-0 end-0" data-bs-toggle="offcanvas" data-bs-target="#warpScreen"><i class="bi bi-rocket"></i></button>
+      <button class="btn btn-link position-absolute top-0 end-0" data-bs-toggle="offcanvas" data-bs-target="#viewScreen" title="Viewscreen On">
+        <i class="bi bi-rocket"></i>
+      </button>
 
       <div class="d-flex justify-content-center">
         <h1 class="ultra-rare fw-bold">Personal Projects</h1>
@@ -286,12 +288,12 @@
   </main>
 
   <!-- MODALS -->
-  <div class="offcanvas offcanvas-top h-100" id="warpScreen" tabindex="-1">
-    <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="warpBody">
-      <button type="button" class="btn position-fixed start-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire">
+  <div class="offcanvas offcanvas-top h-100" id="viewScreen" tabindex="-1">
+    <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="viewScreenBody">
+      <button type="button" class="btn position-fixed start-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire" title="Fire Torpedo">
         <i class="bi bi-fire text-danger"></i>
       </button>
-      <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close">
+      <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close" title="Viewscreen Off">
         <i class="bi bi-x-lg text-light"></i>
       </button>
       <canvas id="warpCanvas"></canvas>
@@ -354,26 +356,26 @@
 
       // Stars
       const STAR_LENGTH = 1.2;
+      const FRAMES_PER_SECOND = 60;
       let animationId;
-      let frames_per_second = 60;
       let stars = [];
 
       // Torpedo
       let torpedoes = [];
 
       // Timings
-      let interval = Math.floor(1000 / frames_per_second);
+      let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
       let previousTime = startTime;
       let currentTime = 0;
       let deltaTime = 0;
 
       // Listeners
-      document.getElementById('warpScreen').addEventListener('shown.bs.offcanvas', e => {
+      document.getElementById('viewScreen').addEventListener('shown.bs.offcanvas', e => {
         screenInit();
         showViewScreenHUD();
       });
-      document.getElementById('warpScreen').addEventListener('hidden.bs.offcanvas', e => {
+      document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
       });
@@ -387,7 +389,7 @@
         }
       })
       screen.orientation.addEventListener('change', () => {
-        let viewScreenOn = document.getElementById('warpScreen').classList.contains('show');
+        let viewScreenOn = document.getElementById('viewScreen').classList.contains('show');
         if(viewScreenOn) {
           // use resize event to get proper screen dimensions (otherwise it usually picks up the previous dimensions)
           var afterOrientation = function() {
