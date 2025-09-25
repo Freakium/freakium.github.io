@@ -143,7 +143,7 @@
       transform: rotate(180deg);
       opacity: 0;
     }
-    .turnFade:hover {
+    .turnFade:hover, .turnFadeOn {
       transform: rotate(0deg);
       opacity: 1;
     }
@@ -346,12 +346,11 @@
       // WARP SPEED SIMULATION
       /****************************************/
       // Screen
-      let canvasWidth, canvasHeight, centerX, centerY;
+      let canvasWidth, canvasHeight, centerX, centerY, clickTimer;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
       let clickCount = 0;
-      clickTimers = [];
 
       // Stars
       const STAR_LENGTH = 1.2;
@@ -383,6 +382,7 @@
         clickCount++;
 
         if(clickCount === 3) {
+          clickCount = 0;
           showViewScreenHUD();
         }
       })
@@ -510,7 +510,6 @@
           const GLOW_SIZE = 32;
           const CORE_OUTER_COLOUR = '#800a00';
           const CORE_INNER_COLOUR = '#f4fd7c';
-          const CORE_SIZE = 25;
 
           this.y -= this.speed;
           this.radius -= 0.5;
@@ -638,18 +637,19 @@
        * Display the viewscreen buttons for 3 seconds,
        */
       function showViewScreenHUD() {
-        let num = 0;
         document.querySelectorAll('.turnFade').forEach(btn => {
-          btn.classList.remove('turnFade');
-          clickCount = 0;
-
-          clearTimeout(clickTimers[num]);
-          clickTimers[num] = setTimeout(() => {
-            btn.classList.add('turnFade');
-          }, 3000);
-
-          num++;
+          btn.classList.add('turnFadeOn');
         });
+
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          document.querySelectorAll('.turnFadeOn').forEach(btn => {
+            btn.classList.remove('turnFadeOn');
+
+            // Reset count if no clicks logged for 3 sec
+            clickCount = 0;
+          });
+        }, 3000);
       }
 
       /**
