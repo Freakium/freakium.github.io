@@ -296,9 +296,14 @@
       <button type="button" class="btn btn-lg position-fixed start-0 bottom-0 turnFade" onclick="firePhaser()" aria-label="Fire" title="Fire Phaser">
         <i class="bi bi-fire text-danger"></i>
       </button>
-      <button type="button" class="btn btn-lg position-fixed end-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire" title="Fire Torpedo">
-        <i class="bi bi-rocket-fill text-danger"></i>
-      </button>
+      <div class="position-fixed end-0 bottom-0">
+        <button type="button" class="btn btn-lg turnFade" onclick="fireTorpedo('photon')" aria-label="Fire" title="Fire Photon Torpedo">
+          <i class="bi bi-rocket-fill text-danger"></i>
+        </button>
+        <button type="button" class="btn btn-lg turnFade" onclick="fireTorpedo('quantum')" aria-label="Fire" title="Fire Quantum Torpedo">
+          <i class="bi bi-rocket-fill text-primary"></i>
+        </button>
+      </div>
       <canvas id="warpCanvas"></canvas>
     </div>
   </div>
@@ -419,13 +424,10 @@
       /**
        * Animate a torpedo firing into the distance.
        */
-      window.fireTorpedo = () => {
-        let torpedo = new Torpedo();
+      window.fireTorpedo = (type) => {
+        let torpedo = new Torpedo(type);
+        torpedo.playSound();
         torpedoes.push(torpedo);
-
-        // play sound
-        let photon = new Audio('aud/photon.wav');
-        photon.play();
       }
 
       /**
@@ -546,14 +548,35 @@
        * Draw an animated torpedo to the canvas.
        */
       class Torpedo {
-        constructor() {
+        constructor(type) {
           this.x = getRandomInt(-5, 5); // introduce some randomness to the shots
           this.y = centerY;
-          this.radius = Math.floor(canvasHeight / 25);
           this.flareAngle = 0;
           this.speed = 6;
 
           this.counter = canvasHeight;
+
+          switch(type) {
+            case 'photon':
+              this.shape = 'circle';
+              this.glowSize = 32;
+              this.radius = Math.floor(canvasHeight / 25);
+              this.glowColour = '#fa1400';
+              this.coreOuterColour = '#800a00';
+              this.coreInnerColour = '#f4fd7c';
+              this.flareSize = 2;
+              this.sound = 'aud/photon.wav';
+              break;
+            case 'quantum':
+              this.shape = 'ellipse';
+              this.glowSize = 48;
+              this.radius = Math.floor(canvasHeight / 20);
+              this.glowColour = '#55b8fa';
+              this.coreOuterColour = '#1b303e';
+              this.coreInnerColour = '#ccc';
+              this.flareSize = 0.4;
+              this.sound = 'aud/quantum.wav';
+          }
         }
 
         drawTorpedo() {
@@ -563,35 +586,35 @@
             return true;
           }
 
-          // colours
-          const GLOW_COLOUR = '#fa1400';
-          const GLOW_SIZE = 32;
-          const CORE_OUTER_COLOUR = '#800a00';
-          const CORE_INNER_COLOUR = '#f4fd7c';
-
           this.y -= this.speed;
           this.radius -= 0.5;
           this.flareAngle = (this.flareAngle + 10) % 360;
 
           // Set glow properties (outer core)
-          mainContext.shadowColor = GLOW_COLOUR;
-          mainContext.shadowBlur = GLOW_SIZE;
+          mainContext.shadowColor = this.glowColour;
+          mainContext.shadowBlur = this.glowSize;
 
           // Draw the outer core
           mainContext.beginPath();
-          mainContext.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-          mainContext.fillStyle = CORE_OUTER_COLOUR;
+          switch(this.shape) {
+            case 'ellipse':
+              mainContext.ellipse(this.x, this.y, this.radius / 2, this.radius, Math.PI / 2, 0, Math.PI * 2);
+              break;
+            default: // circle
+              mainContext.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          }
+          mainContext.fillStyle = this.coreOuterColour;
           mainContext.fill();
 
           // Set glow properties (inner core)
-          mainContext.shadowColor = CORE_INNER_COLOUR;
+          mainContext.shadowColor = this.coreInnerColour;
           mainContext.shadowBlur = 15;
 
           // Draw the inner core
-          let innerRadius = this.radius / 4;
+          let innerRadius = this.radius / 5;
           mainContext.beginPath();
           mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
-          mainContext.fillStyle = CORE_INNER_COLOUR;
+          mainContext.fillStyle = this.coreInnerColour;
           mainContext.fill();
 
           // Prepare rotating flare animation
@@ -601,8 +624,8 @@
 
           // Draw flare
           mainContext.moveTo(0, 0);
-          mainContext.lineTo(this.x, this.radius * 2);
-          mainContext.strokeStyle = CORE_INNER_COLOUR;
+          mainContext.lineTo(this.x, this.radius * this.flareSize);
+          mainContext.strokeStyle = this.coreInnerColour;
           mainContext.lineWidth = this.radius / 10;
           mainContext.stroke();
           mainContext.restore();
@@ -610,6 +633,11 @@
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
           mainContext.shadowBlur = 0;
+        }
+
+        playSound() {
+          let snd = new Audio(this.sound);
+          snd.play();
         }
       }
 
