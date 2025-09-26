@@ -613,7 +613,13 @@
           // Draw the inner core
           let innerRadius = this.radius / 5;
           mainContext.beginPath();
-          mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
+          switch(this.shape) {
+            case 'ellipse':
+              mainContext.ellipse(this.x, this.y, innerRadius / 2, innerRadius, Math.PI / 2, 0, Math.PI * 2);
+              break;
+            default: // circle
+              mainContext.arc(this.x, this.y, innerRadius, 0, Math.PI * 2);
+          }
           mainContext.fillStyle = this.coreInnerColour;
           mainContext.fill();
 
