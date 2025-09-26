@@ -290,11 +290,14 @@
   <!-- MODALS -->
   <div class="offcanvas offcanvas-top h-100" id="viewScreen" tabindex="-1">
     <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="viewScreenBody">
-      <button type="button" class="btn position-fixed start-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire" title="Fire Torpedo">
-        <i class="bi bi-fire text-danger"></i>
-      </button>
       <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close" title="Viewscreen Off">
         <i class="bi bi-x-lg text-light"></i>
+      </button>
+      <button type="button" class="btn btn-lg position-fixed start-0 bottom-0 turnFade" onclick="firePhaser()" aria-label="Fire" title="Fire Phaser">
+        <i class="bi bi-fire text-danger"></i>
+      </button>
+      <button type="button" class="btn btn-lg position-fixed end-0 bottom-0 turnFade" onclick="fireTorpedo()" aria-label="Fire" title="Fire Torpedo">
+        <i class="bi bi-rocket-fill text-danger"></i>
       </button>
       <canvas id="warpCanvas"></canvas>
     </div>
@@ -360,7 +363,8 @@
       let animationId;
       let stars = [];
 
-      // Torpedo
+      // Weapons
+      let phasers = [];
       let torpedoes = [];
 
       // Timings
@@ -399,6 +403,18 @@
           window.addEventListener('resize', afterOrientation);
         }
       });
+
+      /**
+       * Animate a torpedo firing into the distance.
+       */
+      window.firePhaser = () => {
+        let phaser = new Phaser();
+        phasers.push(phaser);
+
+        // play sound
+        let pew = new Audio('aud/phaser.mp3');
+        pew.play();
+      }
 
       /**
        * Animate a torpedo firing into the distance.
@@ -483,6 +499,46 @@
 
           // Stop drawing
           mainContext.closePath();
+        }
+      }
+
+      /**
+       * Draw an animated phaser to the canvas.
+       */
+      class Phaser {
+        constructor() {
+          this.x = getRandomInt(-centerX, centerX); // introduce some randomness to the shots
+          this.y = centerY + 2;
+          this.duration = 135;
+        }
+
+        drawPhaser() {
+          this.duration -= 1;
+
+          if(this.duration < 1) {
+            return true;
+          }
+
+          // colours
+          const GLOW_COLOUR = '#fa1400';
+          const CORE_COLOUR = '#f4fd7c';
+          const GLOW_SIZE = 32;
+
+          // Set glow properties
+          mainContext.shadowColor = GLOW_COLOUR;
+          mainContext.shadowBlur = GLOW_SIZE;
+
+          // Draw the beam
+          mainContext.beginPath();
+          mainContext.moveTo(0, 0);
+          mainContext.lineTo(this.x, this.y);
+          mainContext.lineTo(this.x + 8, this.y);
+          mainContext.fillStyle = CORE_COLOUR;
+          mainContext.fill();
+
+          // Reset shadow properties to avoid affecting other drawings
+          mainContext.shadowColor = 'transparent';
+          mainContext.shadowBlur = 0;
         }
       }
 
@@ -614,6 +670,7 @@
 
           mainContext.translate(centerX, centerY);
 
+          // Draw in overlap order of back to front (stars -> torpedo -> phaser)
           for (let i=0; i < stars.length; i++) {
             let star = stars[i];
             star.drawStar();
@@ -625,6 +682,16 @@
               let index = torpedoes.indexOf(torpedo);
               if (index > -1) {
                 torpedoes.splice(index, 1);
+              }
+            }
+          }
+          for (let k=0; k < phasers.length; k++) {
+            let phaser = phasers[k];
+            let fired = phaser.drawPhaser();
+            if(fired) {
+              let index = phasers.indexOf(phaser);
+              if (index > -1) {
+                phasers.splice(index, 1);
               }
             }
           }
