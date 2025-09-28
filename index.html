@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no">
   <title>Ross Chan's Projects</title>
-  <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="src/img/favicon.ico">
   <link rel=stylesheet href=src/bootstrap/css/bootstrap-icons.min.css>
   <link rel=stylesheet href=src/bootstrap/css/bootstrap.min.css>
   <style>
@@ -75,7 +75,17 @@
     }
 
     #viewScreenBody {
-      background: url('img/stars.jpg');
+      background: url('src/img/stars.jpg');
+    }
+
+    #viewScreenMsg {
+      font-family: Helvetica LT UltraCompressed, Helvetica, sans-serif;
+      color: #f9cb59;
+      text-transform: uppercase;
+    }
+    @font-face {
+      font-family: Helvetica LT UltraCompressed;
+      src: url('src/fonts/helveticalt_ultracompressed.ttf');
     }
 
     #warpCanvas {
@@ -246,7 +256,7 @@
                 <div class="badge bg-primary">JavaScript</div>
               </div>
             </div>
-            <div class="col-lg-6"><a href="invman"><img src="img/InvMan.jpg"></a></div>
+            <div class="col-lg-6"><a href="invman"><img src="src/img/InvMan.jpg"></a></div>
           </div>
         </div>
       </div>
@@ -262,7 +272,7 @@
                 <div class="badge" style="background-color: rgb(5, 160, 129)">Pexels</div>
               </div>
             </div>
-            <div class="col-lg-6"><a href="motivgen"><img src="img/MotivGen.jpg"></a></div>
+            <div class="col-lg-6"><a href="motivgen"><img src="src/img/MotivGen.jpg"></a></div>
           </div>
         </div>
       </div>
@@ -278,7 +288,7 @@
                 <div class="badge bg-primary">JavaScript</div>
               </div>
             </div>
-            <div class="col-lg-6"><a href="shipnamegen"><img src="img/ShipGen.jpg"></a></div>
+            <div class="col-lg-6"><a href="shipnamegen"><img src="src/img/ShipGen.jpg"></a></div>
           </div>
         </div>
       </div>
@@ -304,6 +314,7 @@
           <i class="bi bi-rocket-fill text-primary"></i>
         </button>
       </div>
+      <div id="viewScreenMsg" class="position-fixed mx-auto"></div>
       <canvas id="warpCanvas"></canvas>
     </div>
   </div>
@@ -413,11 +424,16 @@
        * Animate a torpedo firing into the distance.
        */
       window.firePhaser = () => {
+        if(isWarp) {
+          viewScreenMessage('Phasers cannot fire during warp speeds', 4000);
+          return false;
+        }
+
         let phaser = new Phaser();
         phasers.push(phaser);
 
         // play sound
-        let pew = new Audio('aud/phaser.mp3');
+        let pew = new Audio('src/aud/phaser.mp3');
         pew.play();
       }
 
@@ -565,7 +581,7 @@
               this.coreOuterColour = '#800a00';
               this.coreInnerColour = '#f4fd7c';
               this.flareSize = 2;
-              this.sound = 'aud/photon.wav';
+              this.sound = 'src/aud/photon.wav';
               break;
             case 'quantum':
               this.shape = 'ellipse';
@@ -575,7 +591,7 @@
               this.coreOuterColour = '#1b303e';
               this.coreInnerColour = '#ccc';
               this.flareSize = 0.4;
-              this.sound = 'aud/quantum.wav';
+              this.sound = 'src/aud/quantum.wav';
           }
         }
 
@@ -753,6 +769,18 @@
             clickCount = 0;
           });
         }, 3000);
+      }
+
+      /**
+       * Display a message to the viewscreen for a specified amount of time.
+       */
+      function viewScreenMessage(msg, time) {
+        let screen = document.getElementById('viewScreenMsg');
+        screen.innerHTML = `<h1>${msg}</h1>`;
+
+        setTimeout(() => {
+          screen.innerHTML = '';
+        }, time);
       }
 
       /**
