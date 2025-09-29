@@ -367,7 +367,7 @@
       // WARP SPEED SIMULATION
       /****************************************/
       // Screen
-      let canvasWidth, canvasHeight, centerX, centerY, clickTimer;
+      let canvasWidth, canvasHeight, centerX, centerY;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
@@ -384,6 +384,7 @@
       let torpedoes = [];
 
       // Timings
+      let clickTimer, msgTimer;
       let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
       let previousTime = startTime;
@@ -430,11 +431,8 @@
         }
 
         let phaser = new Phaser();
+        phaser.playSound();
         phasers.push(phaser);
-
-        // play sound
-        let pew = new Audio('src/aud/phaser.mp3');
-        pew.play();
       }
 
       /**
@@ -528,6 +526,7 @@
           this.x = getRandomInt(-centerX, centerX); // introduce some randomness to the shots
           this.y = centerY + 2;
           this.duration = 135;
+          this.sound = 'src/aud/phaser.mp3';
         }
 
         drawPhaser() {
@@ -557,6 +556,11 @@
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
           mainContext.shadowBlur = 0;
+        }
+
+        playSound() {
+          let snd = new Audio(this.sound);
+          snd.play();
         }
       }
 
@@ -778,7 +782,8 @@
         let screen = document.getElementById('viewScreenMsg');
         screen.innerHTML = `<h1>${msg}</h1>`;
 
-        setTimeout(() => {
+        clearTimeout(msgTimer);
+        msgTimer = setTimeout(() => {
           screen.innerHTML = '';
         }, time);
       }
