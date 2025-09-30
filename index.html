@@ -534,12 +534,12 @@
           // stars are generated in a warp tunnel
           if(isWarp) {
             const RADIUS = 10;
+            const isLandscape = canvasWidth >= canvasHeight;
 
             let angle = getRandomInt(0, 360);
-
             coords = {
-              x: RADIUS * Math.cos(angle),
-              y: RADIUS * Math.sin(angle)
+              x: (isLandscape ? RADIUS : RADIUS * 2) * Math.cos(angle),
+              y: (isLandscape ? RADIUS * 2 : RADIUS) * Math.sin(angle)
             }
           }
           // stars are generated anywhere on the screen
