@@ -78,7 +78,7 @@
       background: url('src/img/stars.jpg');
     }
 
-    #viewScreenMsg {
+    .lcarsText {
       font-family: Helvetica LT UltraCompressed, Helvetica, sans-serif;
       color: #f9cb59;
       text-transform: uppercase;
@@ -147,7 +147,7 @@
       }
     }
 
-    /* Viewscreen Buttons */
+    /* Viewscreen Interactables */
     .turnFade {
       transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
       transform: rotate(180deg);
@@ -155,6 +155,9 @@
     }
     .turnFade:hover, .turnFadeOn {
       transform: rotate(0deg);
+      opacity: 1;
+    }
+    #warpDisplay:hover {
       opacity: 1;
     }
   </style>
@@ -303,6 +306,14 @@
       <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close" title="Viewscreen Off">
         <i class="bi bi-x-lg text-light"></i>
       </button>
+      <div id="warpDisplay" class="position-fixed col-md-3 mx-auto top-0 fade">
+        <h3 class="lcarsText text-center user-select-none">
+          <span id="speedHeader">Sublight Speed:</span>
+          <span id="speedValue" class="text-primary">Half Impulse</span>
+        </h3>
+        <input type="range" id="impulseInput" class="form-range" min="0" max="1" step="0.25" value="0.5" autocomplete="off">
+        <input type="range" id="warpInput" class="form-range d-none" min="1" max="10" value="5" autocomplete="off">
+      </div>
       <button type="button" class="btn btn-lg position-fixed start-0 bottom-0 turnFade" onclick="firePhaser()" aria-label="Fire" title="Fire Phaser">
         <i class="bi bi-fire text-danger"></i>
       </button>
@@ -314,7 +325,7 @@
           <i class="bi bi-rocket-fill text-primary"></i>
         </button>
       </div>
-      <div id="viewScreenMsg" class="position-fixed mx-auto"></div>
+      <div id="viewScreenMsg" class="position-fixed mx-auto lcarsText"></div>
       <canvas id="warpCanvas"></canvas>
     </div>
   </div>
@@ -366,24 +377,26 @@
 
       // WARP SPEED SIMULATION
       /****************************************/
-      // Screen
+      /********** Screen **********/
       let canvasWidth, canvasHeight, centerX, centerY;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
       let clickCount = 0;
 
-      // Stars
+      /********** Stars **********/
       const STAR_LENGTH = 1.2;
       const FRAMES_PER_SECOND = 60;
+      let impulseSpeed = 0.5;
+      let warpSpeed = 5;
       let animationId;
       let stars = [];
 
-      // Weapons
+      /********** Weapons **********/
       let phasers = [];
       let torpedoes = [];
 
-      // Timings
+      /********** Timings **********/
       let clickTimer, msgTimer;
       let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
@@ -391,24 +404,51 @@
       let currentTime = 0;
       let deltaTime = 0;
 
-      // Listeners
+      /********** Listeners **********/
+      // Viewscreen On
       document.getElementById('viewScreen').addEventListener('shown.bs.offcanvas', e => {
         screenInit();
         showViewScreenHUD();
       });
+      // Viewscreen Off
       document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
       });
+      // Set Impulse Speed
+      document.getElementById('impulseInput').addEventListener('input', e => {
+        let val = parseFloat(e.target.value);
+        setShipSpeed('impulse', val);
+      });
+      // Set Warp Speed
+      document.getElementById('warpInput').addEventListener('input', e => {
+        let val = parseFloat(e.target.value);
+        setShipSpeed('warp', val);
+      });
+      // Click any area of the viewscreen
       viewScreen.addEventListener('click', () => {
         isWarp = !isWarp;
         clickCount++;
+
+        if(isWarp) {
+          document.getElementById('warpInput').classList.remove('d-none');
+          document.getElementById('impulseInput').classList.add('d-none');
+          setShipSpeed('warp', warpSpeed);
+        }
+        else {
+          document.getElementById('impulseInput').classList.remove('d-none');
+          document.getElementById('warpInput').classList.add('d-none');
+
+          // don't set speed of existing stars to create "end of tunnel" effect
+          displaySpeed('impulse', impulseSpeed);
+        }
 
         if(clickCount === 3) {
           clickCount = 0;
           showViewScreenHUD();
         }
-      })
+      });
+      // Change screen orientation
       screen.orientation.addEventListener('change', () => {
         let viewScreenOn = document.getElementById('viewScreen').classList.contains('show');
         if(viewScreenOn) {
@@ -421,6 +461,7 @@
         }
       });
 
+      /********** Interaction **********/
       /**
        * Animate a torpedo firing into the distance.
        */
@@ -445,6 +486,12 @@
       }
 
       /**
+       * Set warp speed by changing the star speed modifier.
+       */
+      window.setWarpSpeed = () => {}
+
+      /********** Classes **********/
+      /**
        * Draw an animated star/starstreak to the canvas.
        */
       class Star {
@@ -462,12 +509,41 @@
         }
 
         #generateStar() {
-          return {
-            x: getRandomInt(-centerX, centerX),
-            y: getRandomInt(-centerY, centerY),
-            radiusMax: getRandomInt(1, 3),
-            speed: isWarp ? getRandomInt(20, 200) : getRandomInt(1, 10)
+          let coords;
+
+          // stars are generated in a warp tunnel
+          if(isWarp) {
+            const RADIUS = 10;
+
+            let angle = getRandomInt(0, 360);
+
+            coords = {
+              x: RADIUS * Math.cos(angle),
+              y: RADIUS * Math.sin(angle)
+            }
           }
+          // stars are generated anywhere on the screen
+          else {
+            coords = {
+              x: getRandomInt(-centerX, centerX),
+              y: getRandomInt(-centerY, centerY)
+            };
+          }
+
+          return {
+            x: coords.x,
+            y: coords.y,
+            radiusMax: getRandomInt(1, 3),
+            speed: this.#speedFormula()
+          }
+        }
+
+        #speedFormula() {
+          return isWarp
+            ? getRandomInt(5, 5 * warpSpeed)
+            : impulseSpeed === 0
+              ? 0
+              : getRandomInt(1, 10 * impulseSpeed)
         }
 
         drawStar() {
@@ -515,6 +591,10 @@
 
           // Stop drawing
           mainContext.closePath();
+        }
+
+        setSpeed() {
+          this.speed = this.#speedFormula();
         }
       }
 
@@ -667,6 +747,7 @@
         }
       }
 
+      /********** Private Functions **********/
       /**
        * Initialize values for current screen size.
        */
@@ -760,18 +841,26 @@
        * Display the viewscreen buttons for 3 seconds,
        */
       function showViewScreenHUD() {
+        // show all UI buttons
         document.querySelectorAll('.turnFade').forEach(btn => {
           btn.classList.add('turnFadeOn');
         });
 
+        // show speed selector
+        document.getElementById('warpDisplay').classList.add('show');
+
         clearTimeout(clickTimer);
         clickTimer = setTimeout(() => {
+          // fade all UI buttons
           document.querySelectorAll('.turnFadeOn').forEach(btn => {
             btn.classList.remove('turnFadeOn');
 
             // Reset count if no clicks logged for 3 sec
             clickCount = 0;
           });
+
+          // fade the speed selector
+          document.getElementById('warpDisplay').classList.remove('show');
         }, 3000);
       }
 
@@ -786,6 +875,65 @@
         msgTimer = setTimeout(() => {
           screen.innerHTML = '';
         }, time);
+      }
+
+      /**
+       * Display speed type and value on the viewscreen.
+       * @param type Speed type (impulse, warp)
+       * @param value The current speed of the stars
+       */
+      function displaySpeed(type, value) {
+        let speedHeader, speedValue;
+
+        // Warp speed, Mr. Sulu
+        if(type === 'warp') {
+          speedHeader = 'Warp Factor:';
+          speedValue = value === 10 ? '9.99' : value;
+        }
+        // Take her out
+        else {
+          speedHeader = 'Sublight Speed:';
+
+          switch(value) {
+            case 0:
+              speedValue = 'Full Stop';
+              break;
+            case 0.25:
+              speedValue = 'One Quarter Impulse';
+              break;
+            case 0.5:
+              speedValue = 'Half Impulse';
+              break;
+            case 0.75:
+              speedValue = 'Three Quarters Impulse';
+              break;
+            case 1:
+              speedValue = 'Full Impulse';
+          }
+        }
+        document.getElementById('speedHeader').innerHTML = speedHeader;
+        document.getElementById('speedValue').innerHTML = speedValue;
+      }
+
+      /**
+       * Set the current speed of the ship which changes how fast stars fly past the screen.
+       * @param type Speed type (impulse, warp)
+       * @param value The current speed of the stars
+       */
+      function setShipSpeed(type, value) {
+        if(type === 'warp') {
+          warpSpeed = value;
+        }
+        else {
+          impulseSpeed = value;
+        }
+
+        // update star speed
+        for (let i=0; i < stars.length; i++) {
+          stars[i].setSpeed();
+        }
+
+        displaySpeed(type, value);
       }
 
       /**
