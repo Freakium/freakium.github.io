@@ -78,6 +78,15 @@
       background: url('src/img/stars.jpg');
     }
 
+    #viewScreenMsg {
+      top: 10%;
+    }
+
+    #warpCanvas {
+      width: 100vw;
+      height: 100vh;
+    }
+    
     .lcarsText {
       font-family: Helvetica LT UltraCompressed, Helvetica, sans-serif;
       color: #f9cb59;
@@ -86,11 +95,6 @@
     @font-face {
       font-family: Helvetica LT UltraCompressed;
       src: url('src/fonts/helveticalt_ultracompressed.ttf');
-    }
-
-    #warpCanvas {
-      width: 100vw;
-      height: 100vh;
     }
 
     /* Animated Background */
@@ -439,7 +443,7 @@
           document.getElementById('impulseInput').classList.remove('d-none');
           document.getElementById('warpInput').classList.add('d-none');
 
-          // don't set speed of existing stars to create "end of tunnel" effect
+          // keeps warp streaks at same speed
           displaySpeed('impulse', impulseSpeed);
         }
 
@@ -651,6 +655,7 @@
         constructor(type) {
           this.x = getRandomInt(-5, 5); // introduce some randomness to the shots
           this.y = centerY;
+          this.radius = Math.floor(canvasHeight / 25);
           this.flareAngle = 0;
           this.speed = 6;
 
@@ -660,7 +665,6 @@
             case 'photon':
               this.shape = 'circle';
               this.glowSize = 32;
-              this.radius = Math.floor(canvasHeight / 25);
               this.glowColour = '#fa1400';
               this.coreOuterColour = '#800a00';
               this.coreInnerColour = '#f4fd7c';
@@ -670,11 +674,10 @@
             case 'quantum':
               this.shape = 'ellipse';
               this.glowSize = 48;
-              this.radius = Math.floor(canvasHeight / 20);
               this.glowColour = '#55b8fa';
               this.coreOuterColour = '#1b303e';
               this.coreInnerColour = '#ccc';
-              this.flareSize = 0.4;
+              this.flareSize = 0.3;
               this.sound = 'src/aud/quantum.wav';
           }
         }
@@ -854,13 +857,13 @@
           // fade all UI buttons
           document.querySelectorAll('.turnFadeOn').forEach(btn => {
             btn.classList.remove('turnFadeOn');
-
-            // Reset count if no clicks logged for 3 sec
-            clickCount = 0;
           });
 
           // fade the speed selector
           document.getElementById('warpDisplay').classList.remove('show');
+
+          // Reset count if no clicks logged for 3 sec
+          clickCount = 0;
         }, 3000);
       }
 
