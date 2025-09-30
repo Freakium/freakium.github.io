@@ -389,12 +389,11 @@
       let clickCount = 0;
 
       /********** Stars **********/
-      const STAR_LENGTH = 1.2;
       const FRAMES_PER_SECOND = 60;
       let impulseSpeed = 0.5;
       let warpSpeed = 5;
-      let animationId;
       let stars = [];
+      let animationId;
 
       /********** Weapons **********/
       let phasers = [];
@@ -445,6 +444,8 @@
         if(isWarp) {
           document.getElementById('warpInput').classList.remove('d-none');
           document.getElementById('impulseInput').classList.add('d-none');
+
+          // prevents slow steaks using impulse speeds
           setShipSpeed('warp', warpSpeed);
 
           // play sound
@@ -505,11 +506,6 @@
         torpedoes.push(torpedo);
       }
 
-      /**
-       * Set warp speed by changing the star speed modifier.
-       */
-      window.setWarpSpeed = () => {}
-
       /********** Classes **********/
       /**
        * Draw an animated star/starstreak to the canvas.
@@ -560,10 +556,10 @@
 
         #speedFormula() {
           return isWarp
-            ? getRandomInt(5, 5 * warpSpeed)
+            ? getRandomFloat(5, 5 * warpSpeed)
             : impulseSpeed === 0
               ? 0
-              : getRandomInt(1, 10 * impulseSpeed)
+              : getRandomFloat(1, 10 * impulseSpeed)
         }
 
         drawStar() {
@@ -576,6 +572,11 @@
             this.y = star.y;
             this.radiusMax = star.radiusMax;
             this.speed = star.speed;
+
+            // warp specific
+            this.warpColour = getRandomInt(0, 1) ? "#a1d7ff" : "#64adcc";
+            this.warpLength = getRandomFloat(1.2, 1.8);
+            this.warpSize = getRandomInt(1, 3);
 
             this.counter = this.#screenEdge;
           }
@@ -595,11 +596,12 @@
           if(isWarp) {
             mainContext.moveTo(starX, starY);
             let prevLoc = {
-              x: STAR_LENGTH * starX,
-              y: STAR_LENGTH * starY
+              x: this.warpLength * starX,
+              y: this.warpLength * starY
             };
             mainContext.lineTo(prevLoc.x, prevLoc.y);
-            mainContext.strokeStyle = getRandomInt(0, 1) ? "#a1d7ff" : "#64adcc"; // varying blues
+            mainContext.strokeStyle = this.warpColour; 
+            mainContext.lineWidth = this.warpSize; 
             mainContext.stroke();
           }
           // Impulse speed
@@ -962,6 +964,15 @@
        */
       function getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      /**
+       * Generate a random floating point number between two specified values.
+       * @param min The minimum value
+       * @param max The maximum value
+       */
+      function getRandomFloat(min, max) {
+        return Math.random() * (max - min) + min;
       }
 
       function remap(value, istart, istop, ostart, ostop) {
