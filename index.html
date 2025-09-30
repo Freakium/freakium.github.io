@@ -413,11 +413,19 @@
       document.getElementById('viewScreen').addEventListener('shown.bs.offcanvas', e => {
         screenInit();
         showViewScreenHUD();
+
+        // play sound
+        let snd = new Audio('src/aud/viewscreenOn.wav');
+        snd.play();
       });
       // Viewscreen Off
       document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
+
+        // play sound
+        let snd = new Audio('src/aud/viewscreenOff.wav');
+        snd.play();
       });
       // Set Impulse Speed
       document.getElementById('impulseInput').addEventListener('input', e => {
@@ -438,6 +446,10 @@
           document.getElementById('warpInput').classList.remove('d-none');
           document.getElementById('impulseInput').classList.add('d-none');
           setShipSpeed('warp', warpSpeed);
+
+          // play sound
+          let snd = new Audio('src/aud/warpEnter.wav');
+          snd.play();
         }
         else {
           document.getElementById('impulseInput').classList.remove('d-none');
@@ -445,6 +457,10 @@
 
           // keeps warp streaks at same speed
           displaySpeed('impulse', impulseSpeed);
+
+          // play sound
+          let snd = new Audio('src/aud/warpExit.wav');
+          snd.play();
         }
 
         if(clickCount === 3) {
