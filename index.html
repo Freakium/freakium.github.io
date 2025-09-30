@@ -599,7 +599,7 @@
               y: STAR_LENGTH * starY
             };
             mainContext.lineTo(prevLoc.x, prevLoc.y);
-            mainContext.strokeStyle = "#a1d7ff";
+            mainContext.strokeStyle = getRandomInt(0, 1) ? "#a1d7ff" : "#64adcc"; // varying blues
             mainContext.stroke();
           }
           // Impulse speed
@@ -915,7 +915,7 @@
 
           switch(value) {
             case 0:
-              speedValue = 'Full Stop';
+              speedValue = '<span class="text-danger">Full Stop<span>';
               break;
             case 0.25:
               speedValue = 'One Quarter Impulse';
