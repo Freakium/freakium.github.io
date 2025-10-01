@@ -318,9 +318,14 @@
         <input type="range" id="impulseInput" class="form-range" min="0" max="1" step="0.25" value="0.5" autocomplete="off">
         <input type="range" id="warpInput" class="form-range d-none" min="1" max="10" value="5" autocomplete="off">
       </div>
-      <button type="button" class="btn btn-lg position-fixed start-0 bottom-0 turnFade" onclick="firePhaser()" aria-label="Fire" title="Fire Phaser">
-        <i class="bi bi-fire text-danger"></i>
-      </button>
+      <div class="position-fixed start-0 bottom-0">
+        <button type="button" class="btn btn-lg turnFade" onclick="firePhaser()" aria-label="Fire" title="Fire Phaser">
+          <i class="bi bi-fire text-danger"></i>
+        </button>
+        <button type="button" class="btn btn-lg turnFade" onclick="firePulsePhaser()" aria-label="Fire" title="Fire Pulse Phasers">
+          <i class="bi bi-fire text-warning"></i>
+        </button>
+      </div>
       <div class="position-fixed end-0 bottom-0">
         <button type="button" class="btn btn-lg turnFade" onclick="fireTorpedo('photon')" aria-label="Fire" title="Fire Photon Torpedo">
           <i class="bi bi-rocket-fill text-danger"></i>
@@ -329,7 +334,7 @@
           <i class="bi bi-rocket-fill text-primary"></i>
         </button>
       </div>
-      <div id="viewScreenMsg" class="position-fixed mx-auto lcarsText"></div>
+      <div id="viewScreenMsg" class="position-fixed mx-auto text-center lcarsText"></div>
       <canvas id="warpCanvas"></canvas>
     </div>
   </div>
@@ -397,6 +402,7 @@
 
       /********** Weapons **********/
       let phasers = [];
+      let pulsePhasers = [];
       let torpedoes = [];
 
       /********** Timings **********/
@@ -412,6 +418,7 @@
       document.getElementById('viewScreen').addEventListener('shown.bs.offcanvas', e => {
         screenInit();
         showViewScreenHUD();
+        displaySpeed('impulse', impulseSpeed);
 
         // play sound
         let snd = new Audio('src/aud/viewscreenOn.wav');
@@ -488,13 +495,37 @@
        */
       window.firePhaser = () => {
         if(isWarp) {
-          viewScreenMessage('Phasers cannot fire during warp speeds', 4000);
+          viewScreenMessage('Phasers cannot fire during warp', 4000);
+
+          // play sound
+          let snd = new Audio('src/aud/warning.mp3');
+          snd.play();
+
           return false;
         }
 
         let phaser = new Phaser();
         phaser.playSound();
         phasers.push(phaser);
+      }
+
+      /**
+       * Animate a torpedo firing into the distance.
+       */
+      window.firePulsePhaser = () => {
+        if(isWarp) {
+          viewScreenMessage('Pulse Phasers cannot fire during warp', 4000);
+
+          // play sound
+          let snd = new Audio('src/aud/warning.mp3');
+          snd.play();
+
+          return false;
+        }
+
+        let pulse = new PulsePhaser();
+        pulse.playSound();
+        pulsePhasers.push(pulse);
       }
 
       /**
@@ -570,15 +601,15 @@
 
             this.x = star.x;
             this.y = star.y;
-            this.radiusMax = star.radiusMax;
             this.speed = star.speed;
+            this.counter = this.#screenEdge;
+            
+            // star specific
+            this.radiusMax = star.radiusMax;
 
             // warp specific
             this.warpColour = getRandomInt(0, 1) ? "#a1d7ff" : "#64adcc";
             this.warpLength = getRandomFloat(1.2, 1.8);
-            this.warpSize = getRandomInt(1, 3);
-
-            this.counter = this.#screenEdge;
           }
 
           let xRatio = this.x / this.counter;
@@ -601,7 +632,7 @@
             };
             mainContext.lineTo(prevLoc.x, prevLoc.y);
             mainContext.strokeStyle = this.warpColour; 
-            mainContext.lineWidth = this.warpSize; 
+            mainContext.lineWidth = this.radiusMax; 
             mainContext.stroke();
           }
           // Impulse speed
@@ -658,6 +689,77 @@
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
           mainContext.shadowBlur = 0;
+
+          // Stop drawing
+          mainContext.closePath();
+        }
+
+        playSound() {
+          let snd = new Audio(this.sound);
+          snd.play();
+        }
+      }
+
+      /**
+       * Draw quad pulse phasers to the canvas.
+       */
+      class PulsePhaser {
+        #screenEdge = canvasWidth >= canvasHeight ? canvasWidth : canvasHeight;
+
+        constructor() {
+          this.x = [-6, -5, 6, 5];
+          this.y = [5, 6];
+
+          this.length = 1.8;
+          this.sound = 'src/aud/pulsephaser.mp3';
+
+          this.counter = 1;
+          this.speed = 20;
+        }
+
+        drawPulsePhaser() {
+          this.counter += this.speed;
+
+          if(this.counter > this.#screenEdge) {
+            return true;
+          }
+
+          // colours
+          const GLOW_COLOUR = '#fc1e1e';
+          const CORE_COLOUR = '#f2ba5f';
+          const GLOW_SIZE = 32;
+
+          // Set glow properties
+          mainContext.shadowColor = GLOW_COLOUR;
+          mainContext.shadowBlur = GLOW_SIZE;
+
+          // Draw the pulse
+          for(let i = 0; i < this.x.length; i++) {
+            let xRatio = this.x[i] / this.counter;
+            let yRatio = this.y[i % 2] / this.counter;
+
+            let starX = remap(xRatio, 0, 1, 0, canvasWidth);
+            let starY = remap(yRatio, 0, 1, 0, canvasHeight);
+
+            let prevLoc = {
+              x: this.length * starX,
+              y: this.length * starY
+            };
+
+            mainContext.beginPath();
+            mainContext.moveTo(starX, starY);
+            mainContext.lineTo(prevLoc.x, prevLoc.y);
+            mainContext.lineWidth = 3;
+            mainContext.strokeStyle = CORE_COLOUR;
+            mainContext.stroke();
+
+            // Reset shadow properties to avoid affecting other drawings
+            mainContext.shadowColor = 'transparent';
+            mainContext.shadowBlur = 0;
+
+            // Stop drawing
+            mainContext.closePath();
+          }
         }
 
         playSound() {
@@ -760,6 +862,9 @@
           // Reset shadow properties to avoid affecting other drawings
           mainContext.shadowColor = 'transparent';
           mainContext.shadowBlur = 0;
+
+          // Stop drawing
+          mainContext.closePath();
         }
 
         playSound() {
@@ -804,7 +909,7 @@
         // let total number of stars be half the pixel count of the longest screen length (calculation already stored in center*)
         let totalStars = canvasWidth >= canvasHeight ? centerX : centerY;
 
-        for (let i=0; i < totalStars; i++) {
+        for (let i = 0; i < totalStars; i++) {
           let star = new Star();
           stars.push(star);
         }
@@ -826,12 +931,12 @@
 
           mainContext.translate(centerX, centerY);
 
-          // Draw in overlap order of back to front (stars -> torpedo -> phaser)
-          for (let i=0; i < stars.length; i++) {
+          // Draw in overlap order of back to front (stars -> torpedo -> pulse phasers -> phaser)
+          for (let i = 0; i < stars.length; i++) {
             let star = stars[i];
             star.drawStar();
           }
-          for (let j=0; j < torpedoes.length; j++) {
+          for (let j = 0; j < torpedoes.length; j++) {
             let torpedo = torpedoes[j];
             let fired = torpedo.drawTorpedo();
             if(fired) {
@@ -841,8 +946,18 @@
               }
             }
           }
-          for (let k=0; k < phasers.length; k++) {
-            let phaser = phasers[k];
+          for (let k = 0; k < pulsePhasers.length; k++) {
+            let pulse = pulsePhasers[k];
+            let fired = pulse.drawPulsePhaser();
+            if(fired) {
+              let index = pulsePhasers.indexOf(pulse);
+              if (index > -1) {
+                pulsePhasers.splice(index, 1);
+              }
+            }
+          }
+          for (let l = 0; l < phasers.length; l++) {
+            let phaser = phasers[l];
             let fired = phaser.drawPhaser();
             if(fired) {
               let index = phasers.indexOf(phaser);
@@ -950,7 +1065,7 @@
         }
 
         // update star speed
-        for (let i=0; i < stars.length; i++) {
+        for (let i = 0; i < stars.length; i++) {
           stars[i].setSpeed();
         }
 
