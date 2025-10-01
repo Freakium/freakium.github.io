@@ -406,7 +406,7 @@
       let torpedoes = [];
 
       /********** Timings **********/
-      let clickTimer, msgTimer;
+      let clickTimer, HUDTimer, msgTimer;
       let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
       let previousTime = startTime;
@@ -471,6 +471,12 @@
           clickCount = 0;
           showViewScreenHUD();
         }
+
+        // reset clickCount if 3 clicks not logged within 3 seconds
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          clickCount = 0;
+        }, 3000);
       });
       // Change screen orientation
       screen.orientation.addEventListener('change', () => {
@@ -757,7 +763,7 @@
         constructor(type) {
           this.x = getRandomInt(-5, 5); // introduce some randomness to the shots
           this.y = centerY;
-          this.radius = Math.floor(canvasHeight / 25);
+          this.radius = Math.floor(canvasHeight / 23);
           this.flareAngle = 0;
           this.speed = 6;
 
@@ -966,8 +972,8 @@
         // show speed selector
         document.getElementById('warpDisplay').classList.add('show');
 
-        clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => {
+        clearTimeout(HUDTimer);
+        HUDTimer = setTimeout(() => {
           // fade all UI buttons
           document.querySelectorAll('.turnFadeOn').forEach(btn => {
             btn.classList.remove('turnFadeOn');
@@ -975,10 +981,7 @@
 
           // fade the speed selector
           document.getElementById('warpDisplay').classList.remove('show');
-
-          // Reset count if no clicks logged for 3 sec
-          clickCount = 0;
-        }, 3000);
+        }, 5000);
       }
 
       /**
