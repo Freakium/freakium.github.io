@@ -420,30 +420,30 @@
         showViewScreenHUD();
         displaySpeed('impulse', impulseSpeed);
 
-        // play sound
-        let snd = new Audio('src/aud/viewscreenOn.wav');
-        snd.play();
+        playAudio('src/aud/viewscreenOn.wav');
       });
       // Viewscreen Off
       document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
 
-        // play sound
-        let snd = new Audio('src/aud/viewscreenOff.wav');
-        snd.play();
+        playAudio('src/aud/viewscreenOff.wav');
       });
       // Set Impulse Speed
       document.getElementById('impulseInput').addEventListener('input', e => {
         let val = parseFloat(e.target.value);
         setShipSpeed('impulse', val);
+
+        playAudio('src/aud/beep.mp3');
       });
       // Set Warp Speed
       document.getElementById('warpInput').addEventListener('input', e => {
         let val = parseFloat(e.target.value);
         setShipSpeed('warp', val);
+
+        playAudio('src/aud/beep.mp3');
       });
-      // Click any area of the viewscreen
+      // Click any area of the viewscreen to go to warp
       viewScreen.addEventListener('click', () => {
         isWarp = !isWarp;
         clickCount++;
@@ -452,23 +452,19 @@
           document.getElementById('warpInput').classList.remove('d-none');
           document.getElementById('impulseInput').classList.add('d-none');
 
-          // prevents slow steaks using impulse speeds
-          setShipSpeed('warp', warpSpeed);
+          playAudio('src/aud/warpEnter.wav');
 
-          // play sound
-          let snd = new Audio('src/aud/warpEnter.wav');
-          snd.play();
+          // prevents slow streaks using impulse speeds
+          setShipSpeed('warp', warpSpeed);
         }
         else {
           document.getElementById('impulseInput').classList.remove('d-none');
           document.getElementById('warpInput').classList.add('d-none');
 
+          playAudio('src/aud/warpExit.wav');
+
           // keeps warp streaks at same speed
           displaySpeed('impulse', impulseSpeed);
-
-          // play sound
-          let snd = new Audio('src/aud/warpExit.wav');
-          snd.play();
         }
 
         if(clickCount === 3) {
@@ -496,10 +492,7 @@
       window.firePhaser = () => {
         if(isWarp) {
           viewScreenMessage('Phasers cannot fire during warp', 4000);
-
-          // play sound
-          let snd = new Audio('src/aud/warning.mp3');
-          snd.play();
+          playAudio('src/aud/warning.mp3');
 
           return false;
         }
@@ -515,10 +508,7 @@
       window.firePulsePhaser = () => {
         if(isWarp) {
           viewScreenMessage('Pulse Phasers cannot fire during warp', 4000);
-
-          // play sound
-          let snd = new Audio('src/aud/warning.mp3');
-          snd.play();
+          playAudio('src/aud/warning.mp3');
 
           return false;
         }
@@ -692,8 +682,7 @@
         }
 
         playSound() {
-          let snd = new Audio(this.sound);
-          snd.play();
+          playAudio(this.sound);
         }
       }
 
@@ -757,8 +746,7 @@
         }
 
         playSound() {
-          let snd = new Audio(this.sound);
-          snd.play();
+          playAudio(this.sound);
         }
       }
 
@@ -862,8 +850,7 @@
         }
 
         playSound() {
-          let snd = new Audio(this.sound);
-          snd.play();
+          playAudio(this.sound);
         }
       }
 
@@ -1064,6 +1051,15 @@
         }
 
         displaySpeed(type, value);
+      }
+
+      /**
+       * Play sound. Can be overlapped.
+       * @param file The file URI
+       */
+      function playAudio(file) {
+        let sound = new Audio(file);
+        sound.play();
       }
 
       /**
