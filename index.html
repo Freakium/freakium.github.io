@@ -376,7 +376,7 @@
        * Randomly sets the main background animation
        */
       function randomBackground() {
-        let rand = getRandomInt(0, BACKGROUNDS.length);
+        let rand = getRandomInt(0, BACKGROUNDS.length - 1);
         let animation = BACKGROUNDS[rand];
 
         document.querySelectorAll('.bg').forEach(bg => {
