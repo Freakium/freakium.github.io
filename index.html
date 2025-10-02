@@ -78,8 +78,12 @@
       background: url('src/img/stars.jpg');
     }
 
+    #viewScreenAlert {
+      top: 5px;
+    }
+
     #viewScreenMsg {
-      top: 10%;
+      top: 30%;
     }
 
     #warpCanvas {
@@ -160,6 +164,9 @@
     .turnFade:hover, .turnFadeOn {
       transform: rotate(0deg);
       opacity: 1;
+    }
+    #warpDisplay {
+      bottom: 48px;
     }
     #warpDisplay:hover {
       opacity: 1;
@@ -304,13 +311,13 @@
     
   </main>
 
-  <!-- MODALS -->
+  <!-- VIEWSCREEN -->
   <div class="offcanvas offcanvas-top h-100" id="viewScreen" tabindex="-1">
     <div class="offcanvas-body bg-black p-0 d-flex align-items-center justify-content-center" id="viewScreenBody">
       <button id="closeViewScreen" type="button" class="btn position-fixed end-0 top-0 turnFade" data-bs-dismiss="offcanvas" aria-label="Close" title="Viewscreen Off">
         <i class="bi bi-x-lg text-light"></i>
       </button>
-      <div id="warpDisplay" class="position-fixed col-10 col-md-3 mx-auto top-0 fade">
+      <div id="warpDisplay" class="position-fixed col-10 col-md-3 mx-auto fade">
         <h3 class="lcarsText text-center user-select-none">
           <span id="speedHeader">Sublight Speed:</span>
           <span id="speedValue" class="text-primary">Half Impulse</span>
@@ -333,6 +340,9 @@
         <button type="button" class="btn btn-lg turnFade" onclick="fireTorpedo('quantum')" aria-label="Fire" title="Fire Quantum Torpedo">
           <i class="bi bi-rocket-fill text-primary"></i>
         </button>
+      </div>
+      <div id="viewScreenAlert" class="position-fixed col-1 fade">
+        <img id="viewScreenAlertImg" width="100%">
       </div>
       <div id="viewScreenMsg" class="position-fixed mx-auto text-center lcarsText"></div>
       <canvas id="warpCanvas"></canvas>
@@ -406,7 +416,7 @@
       let torpedoes = [];
 
       /********** Timings **********/
-      let clickTimer, HUDTimer, msgTimer;
+      let alertTimer, clickTimer, HUDTimer, msgTimer;
       let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
       let previousTime = startTime;
@@ -426,6 +436,9 @@
       document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
+
+        // Clear alert timer to prevent further sfx playing
+        clearTimeout(alertTimer);
 
         playAudio('src/aud/viewscreenOff.wav');
       });
@@ -503,6 +516,9 @@
           return false;
         }
 
+        // Go to red alert!
+        redAlert();
+
         let phaser = new Phaser();
         phaser.playSound();
         phasers.push(phaser);
@@ -519,6 +535,9 @@
           return false;
         }
 
+        // Go to red alert!
+        redAlert();
+
         let pulse = new PulsePhaser();
         pulse.playSound();
         pulsePhasers.push(pulse);
@@ -528,6 +547,9 @@
        * Animate a torpedo firing into the distance.
        */
       window.fireTorpedo = (type) => {
+        // Go to red alert!
+        redAlert();
+
         let torpedo = new Torpedo(type);
         torpedo.playSound();
         torpedoes.push(torpedo);
@@ -1063,6 +1085,35 @@
       function playAudio(file) {
         let sound = new Audio(file);
         sound.play();
+      }
+
+      /**
+       * Display red alert graphic on viewscreen and set to green alert when no weapon fired.
+       */
+      function redAlert() {
+        const RED_ALERT = 'src/img/alertRed.gif';
+
+        let alert = document.getElementById('viewScreenAlert');
+        let img = document.getElementById('viewScreenAlertImg');
+
+        // play red alert klaxon on first weapon firing
+        if(img.getAttribute('src') !== RED_ALERT) {
+          playAudio('src/aud/alertRed.wav');
+        }
+
+        img.setAttribute('src', RED_ALERT);
+        alert.classList.add('show');
+
+        // Condition Green
+        clearTimeout(alertTimer);
+        alertTimer = setTimeout(() => {
+          img.setAttribute('src', 'src/img/alertGreen.gif');
+          playAudio('src/aud/alertGreen.wav');
+
+          alertTimer = setTimeout(() => {
+            alert.classList.remove('show');
+          }, 3000);
+        }, 7000);
       }
 
       /**
