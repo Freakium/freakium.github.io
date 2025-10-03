@@ -636,8 +636,6 @@
           let starX = remap(xRatio, 0, 1, 0, canvasWidth);
           let starY = remap(yRatio, 0, 1, 0, canvasHeight);
 
-          this.radius = remap(this.counter, 0, this.#screenEdge, this.radiusMax, 0);
-
           // Begin drawing
           mainContext.beginPath();
 
@@ -655,7 +653,9 @@
           }
           // Impulse speed
           else {
-            mainContext.arc(starX, starY, this.radius, 0, Math.PI * 2, false);
+            this.radius = remap(this.counter, 0, this.#screenEdge, this.radiusMax, 0);
+
+            mainContext.arc(starX, starY, this.radius, 0, Math.PI * 2);
             mainContext.fillStyle = "#fff";
             mainContext.fill();
           }
@@ -722,7 +722,7 @@
 
         constructor() {
           this.x = [-6, -5, 6, 5];
-          this.y = [5, 6];
+          this.y = [5, 6, 5, 6];
 
           this.length = 1.8;
           this.sound = 'src/aud/pulsephaser.mp3';
@@ -750,7 +750,7 @@
           // Draw the pulse
           for(let i = 0; i < this.x.length; i++) {
             let xRatio = this.x[i] / this.counter;
-            let yRatio = this.y[i % 2] / this.counter;
+            let yRatio = this.y[i] / this.counter;
 
             let starX = remap(xRatio, 0, 1, 0, canvasWidth);
             let starY = remap(yRatio, 0, 1, 0, canvasHeight);
