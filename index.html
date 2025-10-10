@@ -428,9 +428,9 @@
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
       let clickCount = 0;
+      let framesPerSecond = 30;
 
       /********** Stars **********/
-      const FRAMES_PER_SECOND = 60;
       let impulseSpeed = 0.5;
       let warpSpeed = 5;
       let stars = [];
@@ -443,7 +443,7 @@
 
       /********** Timings **********/
       let alertTimer, clickTimer, HUDTimer, msgTimer;
-      let interval = Math.floor(1000 / FRAMES_PER_SECOND);
+      let interval = Math.floor(1000 / framesPerSecond);
       let startTime = performance.now();
       let previousTime = startTime;
       let currentTime = 0;
@@ -462,6 +462,10 @@
       document.getElementById('viewScreen').addEventListener('hidden.bs.offcanvas', e => {
         screenClear();
         isWarp = false;
+
+        // reset red alert graphic
+        document.getElementById('viewScreenAlert').classList.remove('show');
+        document.getElementById('viewScreenAlertImg').setAttribute('src', 'src/img/alertGreen.gif');
 
         // Clear alert timer to prevent further sfx playing
         clearTimeout(alertTimer);
@@ -488,18 +492,12 @@
         clickCount++;
 
         if(isWarp) {
-          document.getElementById('warpInput').classList.remove('d-none');
-          document.getElementById('impulseInput').classList.add('d-none');
-
           playAudio('src/aud/warpEnter.wav');
 
           // prevents slow streaks using impulse speeds
           setShipSpeed('warp', warpSpeed);
         }
         else {
-          document.getElementById('impulseInput').classList.remove('d-none');
-          document.getElementById('warpInput').classList.add('d-none');
-
           playAudio('src/aud/warpExit.wav');
 
           // keeps warp streaks at same speed
@@ -702,7 +700,7 @@
         constructor() {
           this.x = getRandomInt(-centerX, centerX); // introduce some randomness to the shots
           this.y = centerY + 2;
-          this.duration = 135;
+          this.duration = framesPerSecond === 60 ? 135 : 70;
           this.sound = 'src/aud/phaser.mp3';
         }
 
@@ -1057,6 +1055,10 @@
         if(type === 'warp') {
           speedHeader = 'Warp Factor:';
           speedValue = value === 10 ? '9.99' : value;
+
+          // display correct speed input
+          document.getElementById('warpInput').classList.remove('d-none');
+          document.getElementById('impulseInput').classList.add('d-none');
         }
         // Take her out
         else {
@@ -1078,6 +1080,10 @@
             case 1:
               speedValue = 'Full Impulse';
           }
+
+          // display correct speed input
+          document.getElementById('impulseInput').classList.remove('d-none');
+          document.getElementById('warpInput').classList.add('d-none');
         }
         document.getElementById('speedHeader').innerHTML = speedHeader;
         document.getElementById('speedValue').innerHTML = speedValue;
