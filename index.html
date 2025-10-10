@@ -423,12 +423,12 @@
       // WARP SPEED SIMULATION
       /****************************************/
       /********** Screen **********/
+      const FRAMES_PER_SECOND = 60;
       let canvasWidth, canvasHeight, centerX, centerY;
       let viewScreen = document.getElementById('warpCanvas');
       let mainContext = viewScreen.getContext('2d');
       let isWarp = false;
       let clickCount = 0;
-      let framesPerSecond = 30;
 
       /********** Stars **********/
       let impulseSpeed = 0.5;
@@ -443,7 +443,7 @@
 
       /********** Timings **********/
       let alertTimer, clickTimer, HUDTimer, msgTimer;
-      let interval = Math.floor(1000 / framesPerSecond);
+      let interval = Math.floor(1000 / FRAMES_PER_SECOND);
       let startTime = performance.now();
       let previousTime = startTime;
       let currentTime = 0;
@@ -700,7 +700,7 @@
         constructor() {
           this.x = getRandomInt(-centerX, centerX); // introduce some randomness to the shots
           this.y = centerY + 2;
-          this.duration = framesPerSecond === 60 ? 135 : 70;
+          this.duration = 135;
           this.sound = 'src/aud/phaser.mp3';
         }
 
