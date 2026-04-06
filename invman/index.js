@@ -10,11 +10,11 @@
         ${l?`<span class="position-absolute badge-number badge rounded-pill bg-success-subtle text-light-emphasis">${l}</span>`:""}
       </button>`+a,document.getElementById("type-list").innerHTML=a;let i=document.getElementById(`typeListBtn-${t}`);i?i.click():document.getElementById("typeListBtn-All").click(),autocomplete(document.getElementById("itemType"),n)}function o(e,t,a){let l={},n="";switch(document.querySelectorAll(".typeListBtn").forEach(e=>{let t=e.getAttribute("data-name");l[t]=parseInt(e.getAttribute("data-count")),e.classList.contains("active")&&(n=t)}),e){case"delete":l.hasOwnProperty(t)&&(l[t]--,0===l[t]&&delete l[t]);break;case"update":l.hasOwnProperty(a)&&(l[a]--,0===l[a]&&delete l[a]);case"add":l.hasOwnProperty(t)?l[t]++:l[t]=1}d(l,n)}function m(e,t,a,l,n,i,r){let s=new Date(i),d=s.toLocaleString("en-US",{dateStyle:"long",timeStyle:"short"}),o=`<span class="currency-display" data-price="${r}">${u(r??0)}</span>`;document.getElementById("item-list").innerHTML+=`<div class="item-header col" id="${e}">
         <div class="card shadow h-100">
-          <div class="card-header d-flex fw-bold text-white justify-content-between" id="${e}-header" style="background-color: ${l}">
-            <span class="d-flex align-items-center text-nowrap" id="${e}-itemName" title="Item Name">${t}</span>
-            <div class="d-flex">
-              <button class="btn btn-link" onclick="updateItemMode('${e}', true)" title="Duplicate"><i class="bi bi-copy"></i></button>
-              <button class="btn btn-link" onclick="updateItemMode('${e}')" title="Edit"><i class="bi bi-pencil-square"></i></button>
+          <div class="card-header d-flex flex-wrap fw-bold text-white" id="${e}-header" style="background-color: ${l}">
+            <span class="d-flex align-items-center" id="${e}-itemName" title="Item Name">${t}</span>
+            <div class="d-flex ms-auto">
+              <button class="btn btn-sm btn-link" onclick="updateItemMode('${e}', true)" title="Duplicate"><i class="bi bi-copy"></i></button>
+              <button class="btn btn-sm btn-link" onclick="updateItemMode('${e}')" title="Edit"><i class="bi bi-pencil-square"></i></button>
             </div>
           </div>
           <div class="card-body bg-secondary-subtle">
