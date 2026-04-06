@@ -13,8 +13,8 @@
           <div class="card-header d-flex fw-bold text-white justify-content-between" id="${e}-header" style="background-color: ${l}">
             <span class="d-flex align-items-center text-nowrap" id="${e}-itemName" title="Item Name">${t}</span>
             <div class="d-flex">
-              <button class="btn btn-sm btn-link" onclick="updateItemMode('${e}', true)" title="Duplicate"><i class="bi bi-copy"></i></button>
-              <button class="btn btn-sm btn-link" onclick="updateItemMode('${e}')" title="Edit"><i class="bi bi-pencil-square"></i></button>
+              <button class="btn btn-link" onclick="updateItemMode('${e}', true)" title="Duplicate"><i class="bi bi-copy"></i></button>
+              <button class="btn btn-link" onclick="updateItemMode('${e}')" title="Edit"><i class="bi bi-pencil-square"></i></button>
             </div>
           </div>
           <div class="card-body bg-secondary-subtle">
