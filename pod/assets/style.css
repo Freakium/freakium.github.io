@@ -206,10 +206,10 @@ input[type="text"] {
 
 .red-background-reasons-right {
   position: absolute;
-  left: 20%;
-  width: 95%;
-  height: 50%;
-  margin-top: -2%;
+  width: 63%;
+  height: 46%;
+  margin-top: 6%;
+  right: 8%;
   background-color: var(--OD-red);
   opacity: 0.10;
 }
